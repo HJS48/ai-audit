@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Readiness Audit</title>
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --dark: #1f2937;
+      --muted: #6b7280;
+      --light: #f3f4f6;
+      --border: #e5e7eb;
+      --success: #22c55e;
+      --error: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: var(--muted);
+    }
+
+    /* Progress */
+    .progress-container {
+      margin-bottom: 2rem;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    /* Section */
+    .section {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .section-description {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="tel"],
+    .form-group input[type="number"],
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .required::after {
+      content: " *";
+      color: var(--error);
+    }
+
+    /* Radio/Checkbox Groups */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .option-item:hover {
+      border-color: var(--primary-light);
+      background: #f0f7ff;
+    }
+
+    .option-item input {
+      margin-right: 0.75rem;
+    }
+
+    .option-item.selected {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+
+    /* Likert Scale */
+    .likert-scale {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .likert-option {
+      text-align: center;
+      padding: 0.75rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+
+    .likert-option:hover {
+      border-color: var(--primary-light);
+    }
+
+    .likert-option.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Slider */
+    .slider-group {
+      margin-bottom: 1rem;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .slider-label span:last-child {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      -webkit-appearance: none;
+      background: var(--border);
+      border-radius: 4px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    /* Data Source Card */
+    .data-source-card {
+      background: var(--light);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .data-source-card h4 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    /* Navigation */
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary {
+      background: var(--light);
+      color: var(--dark);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-light);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Drag and Drop Ranking */
+    .rank-list {
+      list-style: none;
+    }
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      cursor: grab;
+      transition: all 0.2s;
+    }
+
+    .rank-item:hover {
+      border-color: var(--primary-light);
+    }
+
+    .rank-item.dragging {
+      opacity: 0.5;
+      border-style: dashed;
+    }
+
+    .rank-item .rank-number {
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 1rem;
+    }
+
+    .rank-item .drag-handle {
+      margin-left: auto;
+      color: var(--muted);
+    }
+
+    /* Completion */
+    .completion {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .completion-icon {
+      width: 80px;
+      height: 80px;
+      background: #dcfce7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2.5rem;
+    }
+
+    .completion h2 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .completion p {
+      color: var(--muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .likert-scale {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>AI Readiness Audit</h1>
+      <p>Understand where your agency's information flows—and where it gets stuck.</p>
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <div class="progress-text">
+        <span id="sectionName">Company Basics</span>
+        <span id="progressPercent">0%</span>
+      </div>
+    </div>
+
+    <form id="auditForm">
+      <!-- SECTION 1: Company Basics -->
+      <div class="section active" data-section="1">
+        <h2 class="section-title">Company Basics</h2>
+        <p class="section-description">Tell us about your agency so we can tailor the analysis.</p>
+
+        <div class="form-group">
+          <label class="required">Company name</label>
+          <input type="text" name="company_name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="required">What does your company do?</label>
+          <p class="hint">Select all that apply</p>
+          <div class="options-group">
+            <label class="option-item"><input type="checkbox" name="company_type" value="agency"> Agency</label>
+            <label class="option-item"><input type="checkbox" name="company_type" value="consultancy"> Consultancy</label>
+            <label class="option-item"><input type="checkbox" name="company_type" value="studio"> Studio</label>
+            <label class="option-item"><input type="checkbox" name="company_type" value="in_house"> In-house team</label>
+            <label class="option-item">
+              <input type="checkbox" name="company_type" value="other" id="company_type_other_check">
+              Other: <input type="text" name="company_type_other" id="company_type_other" placeholder="Specify..." style="flex: 1; margin-left: 0.5rem; padding: 0.25rem 0.5rem; border: 1px solid var(--border); border-radius: 4px;" onclick="document.getElementById('company_type_other_check').checked = true;">
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="required">What's your primary focus?</label>
+          <p class="hint">Select all that apply</p>
+          <div class="options-group">
+            <label class="option-item"><input type="checkbox" name="primary_focus" value="performance"> Performance marketing</label>
+            <label class="option-item"><input type="checkbox" name="primary_focus" value="creative"> Creative & brand</label>
+            <label class="option-item"><input type="checkbox" name="primary_focus" value="full_service"> Full-service</label>
+            <label class="option-item"><input type="checkbox" name="primary_focus" value="pr_comms"> PR & comms</label>
+            <label class="option-item"><input type="checkbox" name="primary_focus" value="media_buying"> Media buying</label>
+            <label class="option-item"><input type="checkbox" name="primary_focus" value="strategy"> Strategy & consulting</label>
+            <label class="option-item">
+              <input type="checkbox" name="primary_focus" value="other" id="focus_other_check">
+              Other: <input type="text" name="primary_focus_other" id="focus_other" placeholder="Specify..." style="flex: 1; margin-left: 0.5rem; padding: 0.25rem 0.5rem; border: 1px solid var(--border); border-radius: 4px;" onclick="document.getElementById('focus_other_check').checked = true;">
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="required">Total headcount</label>
+          <input type="number" name="total_headcount" min="1" max="500" required>
+        </div>
+
+        <div class="form-group">
+          <label class="required">Annual revenue band</label>
+          <select name="revenue_band" required>
+            <option value="">Select...</option>
+            <option value="under_500k">&lt; £500k</option>
+            <option value="500k_1m">£500k - £1m</option>
+            <option value="1m_3m">£1m - £3m</option>
+            <option value="3m_10m">£3m - £10m</option>
+            <option value="over_10m">£10m+</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="required">Average seniority of your team</label>
+          <select name="avg_seniority" required>
+            <option value="">Select...</option>
+            <option value="junior">Junior heavy</option>
+            <option value="mixed">Mixed</option>
+            <option value="senior">Senior heavy</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="required">Number of active clients</label>
+          <input type="number" name="num_clients" min="1" max="500" required>
+        </div>
+
+        <div class="form-group">
+          <label class="required">Average client value per year (£)</label>
+          <input type="number" name="avg_client_value" min="0" step="1000" required>
+        </div>
+
+        <div class="form-group">
+          <label>How many clients did you lose in the last 12 months?</label>
+          <input type="number" name="clients_lost" min="0">
+        </div>
+
+        <div class="form-group">
+          <label class="required">How many new deals do you pitch per year?</label>
+          <input type="number" name="deals_per_year" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label>Of deals you pitch, roughly what % do you win?</label>
+          <select name="win_rate">
+            <option value="">Select...</option>
+            <option value="under_10">&lt; 10%</option>
+            <option value="10_25">10-25%</option>
+            <option value="25_40">25-40%</option>
+            <option value="over_40">40%+</option>
+            <option value="unknown">Don't know</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="required">How many projects do you deliver per year?</label>
+          <input type="number" name="projects_per_year" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label>How many people left in the last 12 months?</label>
+          <input type="number" name="people_left" min="0">
+        </div>
+
+        <div class="form-group">
+          <label>On a typical project, how many revision rounds happen before final sign-off?</label>
+          <select name="typical_revisions">
+            <option value="">Select...</option>
+            <option value="1">1 round</option>
+            <option value="2">2 rounds</option>
+            <option value="3">3 rounds</option>
+            <option value="4">4+ rounds</option>
+            <option value="varies">Varies too much to say</option>
+          </select>
+        </div>
+
+        <div class="nav-buttons">
+          <div></div>
+          <button type="button" class="btn btn-primary" onclick="nextSection()">Continue</button>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Team Split -->
+      <div class="section" data-section="2">
+        <h2 class="section-title">Team Structure</h2>
+        <p class="section-description">How many people work in each area? Enter 0 for departments you don't have. Don't worry about being exact.</p>
+
+        <div class="dept-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Creative</label>
+            <input type="number" name="dept_creative" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Media</label>
+            <input type="number" name="dept_media" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Account Management</label>
+            <input type="number" name="dept_am" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Strategy</label>
+            <input type="number" name="dept_strategy" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Analytics / Data</label>
+            <input type="number" name="dept_analytics" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Production</label>
+            <input type="number" name="dept_production" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Sales / New Business</label>
+            <input type="number" name="dept_sales" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Operations</label>
+            <input type="number" name="dept_ops" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Finance</label>
+            <input type="number" name="dept_finance" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">HR / People</label>
+            <input type="number" name="dept_hr" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Leadership / Exec</label>
+            <input type="number" name="dept_leadership" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.9rem;">Other</label>
+            <input type="number" name="dept_other" min="0" max="200" value="0" style="width: 100%;" onchange="updateDeptTotal()">
+          </div>
+        </div>
+
+        <div id="deptTotalBox" style="text-align: center; padding: 1rem; background: var(--light); border-radius: 6px; margin-top: 1.5rem;">
+          <strong>Total: <span id="deptTotal">0</span> people</strong>
+          <span id="deptMismatch" style="display: none; color: var(--error); margin-left: 1rem; font-size: 0.85rem;">(doesn't match headcount above)</span>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn btn-secondary" onclick="prevSection()">Back</button>
+          <button type="button" class="btn btn-primary" onclick="nextSection()">Continue</button>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Data Sources -->
+      <div class="section" data-section="3">
+        <h2 class="section-title">Where Does Your Data Live?</h2>
+        <p class="section-description">For each data source, tell us how information is captured, connected, and accessed.</p>
+
+        <!-- Call Recordings -->
+        <div class="data-source-card">
+          <h4>Call Recordings</h4>
+
+          <div class="form-group">
+            <label>Do you record client calls?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="calls_capture" value="0"> Never</label>
+              <label class="option-item"><input type="radio" name="calls_capture" value="20"> Rarely</label>
+              <label class="option-item"><input type="radio" name="calls_capture" value="40"> Some calls</label>
+              <label class="option-item"><input type="radio" name="calls_capture" value="60"> Most calls</label>
+              <label class="option-item"><input type="radio" name="calls_capture" value="80"> All calls</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>What happens to recordings?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="calls_connect" value="0"> Nothing</label>
+              <label class="option-item"><input type="radio" name="calls_connect" value="25"> Stored but not transcribed</label>
+              <label class="option-item"><input type="radio" name="calls_connect" value="50"> Transcribed</label>
+              <label class="option-item"><input type="radio" name="calls_connect" value="100"> Transcribed & searchable</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Who can access them?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="calls_access" value="0"> No one</label>
+              <label class="option-item"><input type="radio" name="calls_access" value="25"> Just recorder</label>
+              <label class="option-item"><input type="radio" name="calls_access" value="50"> Their team</label>
+              <label class="option-item"><input type="radio" name="calls_access" value="100"> Anyone in company</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Which tool do you use?</label>
+            <div class="tool-select">
+              <select name="calls_tool" onchange="toggleOtherInput(this, 'calls_tool_other')">
+                <option value="">Select...</option>
+                <option value="fireflies">Fireflies</option>
+                <option value="gong">Gong</option>
+                <option value="otter">Otter</option>
+                <option value="fathom">Fathom</option>
+                <option value="zoom">Zoom (built-in)</option>
+                <option value="none">None</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" name="calls_tool_other" id="calls_tool_other" placeholder="Please specify..." style="display: none; margin-top: 0.5rem;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Internal Messaging -->
+        <div class="data-source-card">
+          <h4>Internal Messaging (Slack/Teams)</h4>
+
+          <div class="form-group">
+            <label>Are important decisions captured outside of chat?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="messaging_capture" value="0"> Never</label>
+              <label class="option-item"><input type="radio" name="messaging_capture" value="20"> Rarely</label>
+              <label class="option-item"><input type="radio" name="messaging_capture" value="40"> Sometimes</label>
+              <label class="option-item"><input type="radio" name="messaging_capture" value="60"> Usually</label>
+              <label class="option-item"><input type="radio" name="messaging_capture" value="80"> Always</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Can you search for decisions made months ago?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="messaging_connect" value="0"> No</label>
+              <label class="option-item"><input type="radio" name="messaging_connect" value="25"> With difficulty</label>
+              <label class="option-item"><input type="radio" name="messaging_connect" value="50"> Yes in chat</label>
+              <label class="option-item"><input type="radio" name="messaging_connect" value="100"> Yes in a separate system</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Who can find past decisions?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="messaging_access" value="0"> No one</label>
+              <label class="option-item"><input type="radio" name="messaging_access" value="25"> Just people in the thread</label>
+              <label class="option-item"><input type="radio" name="messaging_access" value="50"> Their team</label>
+              <label class="option-item"><input type="radio" name="messaging_access" value="100"> Anyone</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Which tool do you use?</label>
+            <div class="tool-select">
+              <select name="messaging_tool" onchange="toggleOtherInput(this, 'messaging_tool_other')">
+                <option value="">Select...</option>
+                <option value="slack">Slack</option>
+                <option value="teams">Microsoft Teams</option>
+                <option value="discord">Discord</option>
+                <option value="none">None</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" name="messaging_tool_other" id="messaging_tool_other" placeholder="Please specify..." style="display: none; margin-top: 0.5rem;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="data-source-card">
+          <h4>Email</h4>
+
+          <div class="form-group">
+            <label>Are client emails stored centrally?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="email_capture" value="0"> No, individual inboxes</label>
+              <label class="option-item"><input type="radio" name="email_capture" value="33"> Some shared inboxes</label>
+              <label class="option-item"><input type="radio" name="email_capture" value="66"> Mostly centralised</label>
+              <label class="option-item"><input type="radio" name="email_capture" value="100"> Fully centralised</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Can you search across all client emails?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="email_connect" value="0"> No</label>
+              <label class="option-item"><input type="radio" name="email_connect" value="25"> Own inbox only</label>
+              <label class="option-item"><input type="radio" name="email_connect" value="50"> Team inboxes</label>
+              <label class="option-item"><input type="radio" name="email_connect" value="100"> All company email</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Who can access client email history?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="email_access" value="0"> Just sender</label>
+              <label class="option-item"><input type="radio" name="email_access" value="50"> Their team</label>
+              <label class="option-item"><input type="radio" name="email_access" value="100"> Anyone who needs it</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Which tool do you use?</label>
+            <div class="tool-select">
+              <select name="email_tool" onchange="toggleOtherInput(this, 'email_tool_other')">
+                <option value="">Select...</option>
+                <option value="gmail">Gmail / Google Workspace</option>
+                <option value="outlook">Outlook / Microsoft 365</option>
+                <option value="front">Front</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" name="email_tool_other" id="email_tool_other" placeholder="Please specify..." style="display: none; margin-top: 0.5rem;">
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn btn-secondary" onclick="prevSection()">Back</button>
+          <button type="button" class="btn btn-primary" onclick="nextSection()">Continue</button>
+        </div>
+      </div>
+
+      <!-- SECTION 4: More Data Sources -->
+      <div class="section" data-section="4">
+        <h2 class="section-title">Where Does Your Data Live? (continued)</h2>
+        <p class="section-description">A few more data sources to cover.</p>
+
+        <!-- File Storage -->
+        <div class="data-source-card">
+          <h4>File Storage</h4>
+
+          <div class="form-group">
+            <label>Where do project files live?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="files_capture" value="0"> Local drives</label>
+              <label class="option-item"><input type="radio" name="files_capture" value="33"> Shared but messy</label>
+              <label class="option-item"><input type="radio" name="files_capture" value="66"> Organised by project</label>
+              <label class="option-item"><input type="radio" name="files_capture" value="100"> Well-structured & tagged</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>How easy to find the right version?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="files_connect" value="0"> Very hard</label>
+              <label class="option-item"><input type="radio" name="files_connect" value="33"> Takes time</label>
+              <label class="option-item"><input type="radio" name="files_connect" value="66"> Usually find it</label>
+              <label class="option-item"><input type="radio" name="files_connect" value="100"> Easy</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Who can access project files?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="files_access" value="0"> Owner only</label>
+              <label class="option-item"><input type="radio" name="files_access" value="25"> Project team</label>
+              <label class="option-item"><input type="radio" name="files_access" value="50"> Department</label>
+              <label class="option-item"><input type="radio" name="files_access" value="100"> Anyone</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Which tool do you use?</label>
+            <div class="tool-select">
+              <select name="files_tool" onchange="toggleOtherInput(this, 'files_tool_other')">
+                <option value="">Select...</option>
+                <option value="gdrive">Google Drive</option>
+                <option value="dropbox">Dropbox</option>
+                <option value="sharepoint">SharePoint / OneDrive</option>
+                <option value="box">Box</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" name="files_tool_other" id="files_tool_other" placeholder="Please specify..." style="display: none; margin-top: 0.5rem;">
+            </div>
+          </div>
+        </div>
+
+        <!-- CRM -->
+        <div class="data-source-card">
+          <h4>CRM</h4>
+
+          <div class="form-group">
+            <label>How complete is your CRM data?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="crm_capture" value="0"> No CRM</label>
+              <label class="option-item"><input type="radio" name="crm_capture" value="33"> Patchy</label>
+              <label class="option-item"><input type="radio" name="crm_capture" value="66"> Mostly complete</label>
+              <label class="option-item"><input type="radio" name="crm_capture" value="100"> Comprehensive</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Is CRM the source of truth for client info?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="crm_connect" value="0"> No</label>
+              <label class="option-item"><input type="radio" name="crm_connect" value="33"> Sometimes</label>
+              <label class="option-item"><input type="radio" name="crm_connect" value="66"> Usually</label>
+              <label class="option-item"><input type="radio" name="crm_connect" value="100"> Always</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Who updates the CRM?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="crm_access" value="0"> No one</label>
+              <label class="option-item"><input type="radio" name="crm_access" value="33"> Sales only</label>
+              <label class="option-item"><input type="radio" name="crm_access" value="66"> Client-facing teams</label>
+              <label class="option-item"><input type="radio" name="crm_access" value="100"> Everyone relevant</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Which tool do you use?</label>
+            <div class="tool-select">
+              <select name="crm_tool" onchange="toggleOtherInput(this, 'crm_tool_other')">
+                <option value="">Select...</option>
+                <option value="hubspot">HubSpot</option>
+                <option value="salesforce">Salesforce</option>
+                <option value="pipedrive">Pipedrive</option>
+                <option value="none">None</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" name="crm_tool_other" id="crm_tool_other" placeholder="Please specify..." style="display: none; margin-top: 0.5rem;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Project Management -->
+        <div class="data-source-card">
+          <h4>Project Management</h4>
+
+          <div class="form-group">
+            <label>Do all projects live in your PM tool?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="pm_capture" value="0"> No PM tool</label>
+              <label class="option-item"><input type="radio" name="pm_capture" value="33"> Some projects</label>
+              <label class="option-item"><input type="radio" name="pm_capture" value="66"> Most projects</label>
+              <label class="option-item"><input type="radio" name="pm_capture" value="100"> All projects</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Is project status accurate?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="pm_connect" value="0"> No</label>
+              <label class="option-item"><input type="radio" name="pm_connect" value="33"> Often outdated</label>
+              <label class="option-item"><input type="radio" name="pm_connect" value="66"> Usually accurate</label>
+              <label class="option-item"><input type="radio" name="pm_connect" value="100"> Real-time</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Who can see project status?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="pm_access" value="0"> Project owner</label>
+              <label class="option-item"><input type="radio" name="pm_access" value="25"> Project team</label>
+              <label class="option-item"><input type="radio" name="pm_access" value="50"> Department</label>
+              <label class="option-item"><input type="radio" name="pm_access" value="100"> Leadership & anyone</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Which tool do you use?</label>
+            <div class="tool-select">
+              <select name="pm_tool" onchange="toggleOtherInput(this, 'pm_tool_other')">
+                <option value="">Select...</option>
+                <option value="monday">Monday</option>
+                <option value="asana">Asana</option>
+                <option value="clickup">ClickUp</option>
+                <option value="teamwork">Teamwork</option>
+                <option value="basecamp">Basecamp</option>
+                <option value="jira">Jira</option>
+                <option value="trello">Trello</option>
+                <option value="none">None</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" name="pm_tool_other" id="pm_tool_other" placeholder="Please specify..." style="display: none; margin-top: 0.5rem;">
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn btn-secondary" onclick="prevSection()">Back</button>
+          <button type="button" class="btn btn-primary" onclick="nextSection()">Continue</button>
+        </div>
+      </div>
+
+      <!-- SECTION 5: Even More Data Sources -->
+      <div class="section" data-section="5">
+        <h2 class="section-title">Where Does Your Data Live? (final)</h2>
+        <p class="section-description">Last few data sources.</p>
+
+        <!-- Docs & Wikis -->
+        <div class="data-source-card">
+          <h4>Docs & Wikis</h4>
+
+          <div class="form-group">
+            <label>Where does process knowledge live?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="docs_capture" value="0"> People's heads</label>
+              <label class="option-item"><input type="radio" name="docs_capture" value="33"> Scattered docs</label>
+              <label class="option-item"><input type="radio" name="docs_capture" value="66"> Central but outdated</label>
+              <label class="option-item"><input type="radio" name="docs_capture" value="100"> Central & maintained</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Can you search company knowledge?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="docs_connect" value="0"> No</label>
+              <label class="option-item"><input type="radio" name="docs_connect" value="33"> With difficulty</label>
+              <label class="option-item"><input type="radio" name="docs_connect" value="66"> Yes but patchy</label>
+              <label class="option-item"><input type="radio" name="docs_connect" value="100"> Yes easily</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Who maintains documentation?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="docs_access" value="0"> No one</label>
+              <label class="option-item"><input type="radio" name="docs_access" value="33"> Individuals</label>
+              <label class="option-item"><input type="radio" name="docs_access" value="66"> Some teams</label>
+              <label class="option-item"><input type="radio" name="docs_access" value="100"> Dedicated owner</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Which tool do you use?</label>
+            <div class="tool-select">
+              <select name="docs_tool" onchange="toggleOtherInput(this, 'docs_tool_other')">
+                <option value="">Select...</option>
+                <option value="notion">Notion</option>
+                <option value="confluence">Confluence</option>
+                <option value="coda">Coda</option>
+                <option value="gdocs">Google Docs</option>
+                <option value="none">None</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" name="docs_tool_other" id="docs_tool_other" placeholder="Please specify..." style="display: none; margin-top: 0.5rem;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Ad Platforms -->
+        <div class="data-source-card">
+          <h4>Ad Platforms</h4>
+
+          <div class="form-group">
+            <label>Where does campaign data live?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="ads_capture" value="0"> In platforms only</label>
+              <label class="option-item"><input type="radio" name="ads_capture" value="33"> Exported manually</label>
+              <label class="option-item"><input type="radio" name="ads_capture" value="66"> Auto-exported</label>
+              <label class="option-item"><input type="radio" name="ads_capture" value="100"> Connected & live</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>How easy to get cross-platform view?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="ads_connect" value="0"> Very hard</label>
+              <label class="option-item"><input type="radio" name="ads_connect" value="33"> Manual work</label>
+              <label class="option-item"><input type="radio" name="ads_connect" value="66"> Semi-automated</label>
+              <label class="option-item"><input type="radio" name="ads_connect" value="100"> Easy & live</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Who can access performance data?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="ads_access" value="0"> Media team only</label>
+              <label class="option-item"><input type="radio" name="ads_access" value="25"> Media & AMs</label>
+              <label class="option-item"><input type="radio" name="ads_access" value="50"> Anyone client-facing</label>
+              <label class="option-item"><input type="radio" name="ads_access" value="100"> Anyone</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Which platforms do you use?</label>
+            <p class="hint">Select all that apply</p>
+            <div class="options-group">
+              <label class="option-item"><input type="checkbox" name="ads_platforms" value="meta"> Meta (Facebook/Instagram)</label>
+              <label class="option-item"><input type="checkbox" name="ads_platforms" value="google"> Google Ads</label>
+              <label class="option-item"><input type="checkbox" name="ads_platforms" value="linkedin"> LinkedIn</label>
+              <label class="option-item"><input type="checkbox" name="ads_platforms" value="tiktok"> TikTok</label>
+              <label class="option-item"><input type="checkbox" name="ads_platforms" value="twitter"> X / Twitter</label>
+              <label class="option-item"><input type="checkbox" name="ads_platforms" value="programmatic"> Programmatic (DV360, TTD, etc.)</label>
+              <label class="option-item">
+                <input type="checkbox" name="ads_platforms" value="other" id="ads_other_check">
+                Other: <input type="text" name="ads_platforms_other" id="ads_platforms_other" placeholder="Specify..." style="flex: 1; margin-left: 0.5rem; padding: 0.25rem 0.5rem; border: 1px solid var(--border); border-radius: 4px;" onclick="document.getElementById('ads_other_check').checked = true;">
+              </label>
+              <label class="option-item"><input type="checkbox" name="ads_platforms" value="none"> We don't run paid ads</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytics -->
+        <div class="data-source-card">
+          <h4>Analytics</h4>
+
+          <div class="form-group">
+            <label>Where does analytics data live?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="analytics_capture" value="0"> No analytics</label>
+              <label class="option-item"><input type="radio" name="analytics_capture" value="33"> In platform only</label>
+              <label class="option-item"><input type="radio" name="analytics_capture" value="66"> Exported</label>
+              <label class="option-item"><input type="radio" name="analytics_capture" value="100"> Dashboarded</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>How accessible are insights?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="analytics_connect" value="0"> Not accessible</label>
+              <label class="option-item"><input type="radio" name="analytics_connect" value="33"> Analysts only</label>
+              <label class="option-item"><input type="radio" name="analytics_connect" value="66"> On request</label>
+              <label class="option-item"><input type="radio" name="analytics_connect" value="100"> Self-serve</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Who can access analytics?</label>
+            <div class="options-group">
+              <label class="option-item"><input type="radio" name="analytics_access" value="0"> No one</label>
+              <label class="option-item"><input type="radio" name="analytics_access" value="25"> Analytics team</label>
+              <label class="option-item"><input type="radio" name="analytics_access" value="50"> Client teams</label>
+              <label class="option-item"><input type="radio" name="analytics_access" value="100"> Anyone</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Which tool do you use?</label>
+            <div class="tool-select">
+              <select name="analytics_tool" onchange="toggleOtherInput(this, 'analytics_tool_other')">
+                <option value="">Select...</option>
+                <option value="ga4">Google Analytics (GA4)</option>
+                <option value="looker">Looker Studio</option>
+                <option value="mixpanel">Mixpanel</option>
+                <option value="amplitude">Amplitude</option>
+                <option value="tableau">Tableau</option>
+                <option value="powerbi">Power BI</option>
+                <option value="none">None</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" name="analytics_tool_other" id="analytics_tool_other" placeholder="Please specify..." style="display: none; margin-top: 0.5rem;">
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn btn-secondary" onclick="prevSection()">Back</button>
+          <button type="button" class="btn btn-primary" onclick="nextSection()">Continue</button>
+        </div>
+      </div>
+
+      <!-- SECTION 6: Pain Signals -->
+      <div class="section" data-section="6">
+        <h2 class="section-title">Pain Signals</h2>
+        <p class="section-description">How much do you agree with each statement?</p>
+
+        <h4 style="color: var(--primary); margin: 1.5rem 0 1rem;">Time Bleeding</h4>
+
+        <div class="form-group">
+          <label>People spend too much time searching for information</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_searching', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_searching', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_searching', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_searching', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_searching" value="">
+        </div>
+
+        <div class="form-group">
+          <label>The same questions get asked repeatedly across the team</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_repeat', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_repeat', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_repeat', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_repeat', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_repeat" value="">
+        </div>
+
+        <div class="form-group">
+          <label>We often don't know who knows what</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_who_knows', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_who_knows', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_who_knows', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_who_knows', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_who_knows" value="">
+        </div>
+
+        <h4 style="color: var(--primary); margin: 1.5rem 0 1rem;">Knowledge Loss</h4>
+
+        <div class="form-group">
+          <label>When someone leaves, client knowledge goes with them</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_knowledge_leaves', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_knowledge_leaves', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_knowledge_leaves', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_knowledge_leaves', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_knowledge_leaves" value="">
+        </div>
+
+        <div class="form-group">
+          <label>New hires take too long to get up to speed</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_new_hire', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_new_hire', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_new_hire', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_new_hire', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_new_hire" value="">
+        </div>
+
+        <div class="form-group">
+          <label>Critical information lives in too few people's heads</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_few_heads', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_few_heads', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_few_heads', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_few_heads', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_few_heads" value="">
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn btn-secondary" onclick="prevSection()">Back</button>
+          <button type="button" class="btn btn-primary" onclick="nextSection()">Continue</button>
+        </div>
+      </div>
+
+      <!-- SECTION 7: More Pain Signals -->
+      <div class="section" data-section="7">
+        <h2 class="section-title">Pain Signals (continued)</h2>
+        <p class="section-description">A few more areas to explore.</p>
+
+        <h4 style="color: var(--primary); margin: 1.5rem 0 1rem;">Churn</h4>
+
+        <div class="form-group">
+          <label>We've been surprised by a client wanting to leave</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_surprise_churn', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_surprise_churn', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_surprise_churn', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_surprise_churn', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_surprise_churn" value="">
+        </div>
+
+        <div class="form-group">
+          <label>Client health is hard to see until there's a problem</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_client_health', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_client_health', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_client_health', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_client_health', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_client_health" value="">
+        </div>
+
+        <div class="form-group">
+          <label>Warning signs don't reach the right people fast enough</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_warning_signs', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_warning_signs', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_warning_signs', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_warning_signs', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_warning_signs" value="">
+        </div>
+
+        <h4 style="color: var(--primary); margin: 1.5rem 0 1rem;">Missed Deals</h4>
+
+        <div class="form-group">
+          <label>Things promised in sales don't always make it to delivery</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_sales_delivery', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_sales_delivery', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_sales_delivery', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_sales_delivery', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_sales_delivery" value="">
+        </div>
+
+        <div class="form-group">
+          <label>We lose context between pitching and onboarding</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_pitch_onboard', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_pitch_onboard', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_pitch_onboard', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_pitch_onboard', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_pitch_onboard" value="">
+        </div>
+
+        <div class="form-group">
+          <label>Sales and delivery aren't always aligned on what was agreed</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_alignment', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_alignment', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_alignment', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_alignment', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_alignment" value="">
+        </div>
+
+        <h4 style="color: var(--primary); margin: 1.5rem 0 1rem;">Rework</h4>
+
+        <div class="form-group">
+          <label>Projects go through more revision rounds than they should</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_revisions', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_revisions', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_revisions', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_revisions', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_revisions" value="">
+        </div>
+
+        <div class="form-group">
+          <label>We sometimes deliver work that misses the brief</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_miss_brief', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_miss_brief', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_miss_brief', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_miss_brief', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_miss_brief" value="">
+        </div>
+
+        <div class="form-group">
+          <label>Teams work with outdated or wrong information</label>
+          <div class="likert-scale">
+            <div class="likert-option" onclick="selectLikert(this, 'pain_outdated', 1)">Strongly disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_outdated', 2)">Disagree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_outdated', 3)">Agree</div>
+            <div class="likert-option" onclick="selectLikert(this, 'pain_outdated', 4)">Strongly agree</div>
+          </div>
+          <input type="hidden" name="pain_outdated" value="">
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn btn-secondary" onclick="prevSection()">Back</button>
+          <button type="button" class="btn btn-primary" onclick="nextSection()">Continue</button>
+        </div>
+      </div>
+
+      <!-- SECTION 8: Priorities -->
+      <div class="section" data-section="8">
+        <h2 class="section-title">Priorities</h2>
+        <p class="section-description">Help us understand what matters most to you.</p>
+
+        <div class="form-group">
+          <label>Rank in order of importance to you right now</label>
+          <p class="hint">Drag to reorder. #1 = most important.</p>
+          <ul class="rank-list" id="priorityRank">
+            <li class="rank-item" draggable="true" data-value="speed">
+              <span class="rank-number">1</span>
+              <span>Speed</span>
+              <span class="drag-handle">⋮⋮</span>
+            </li>
+            <li class="rank-item" draggable="true" data-value="cost_savings">
+              <span class="rank-number">2</span>
+              <span>Cost savings</span>
+              <span class="drag-handle">⋮⋮</span>
+            </li>
+            <li class="rank-item" draggable="true" data-value="retention">
+              <span class="rank-number">3</span>
+              <span>Client retention</span>
+              <span class="drag-handle">⋮⋮</span>
+            </li>
+            <li class="rank-item" draggable="true" data-value="efficiency">
+              <span class="rank-number">4</span>
+              <span>Team efficiency</span>
+              <span class="drag-handle">⋮⋮</span>
+            </li>
+            <li class="rank-item" draggable="true" data-value="growth">
+              <span class="rank-number">5</span>
+              <span>Growth readiness</span>
+              <span class="drag-handle">⋮⋮</span>
+            </li>
+          </ul>
+          <input type="hidden" name="priority_rank" id="priorityRankInput" value="speed,cost_savings,retention,efficiency,growth">
+        </div>
+
+        <div class="form-group">
+          <label>What's your biggest frustration with how information flows in your business?</label>
+          <textarea name="frustration" rows="4" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 1rem; resize: vertical;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Are you actively exploring AI tools for your business?</label>
+          <div class="options-group">
+            <label class="option-item"><input type="radio" name="ai_interest" value="using"> Yes, already using some</label>
+            <label class="option-item"><input type="radio" name="ai_interest" value="researching"> Yes, researching</label>
+            <label class="option-item"><input type="radio" name="ai_interest" value="not_yet"> Not yet</label>
+            <label class="option-item"><input type="radio" name="ai_interest" value="no_interest"> No interest</label>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn btn-secondary" onclick="prevSection()">Back</button>
+          <button type="button" class="btn btn-primary" onclick="nextSection()">Continue</button>
+        </div>
+      </div>
+
+      <!-- SECTION 9: Contact -->
+      <div class="section" data-section="9">
+        <h2 class="section-title">Get Your Report</h2>
+        <p class="section-description">We'll send your personalised AI Readiness Report to this email.</p>
+
+        <div class="form-group">
+          <label class="required">Email</label>
+          <input type="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" name="name">
+        </div>
+
+        <div class="form-group">
+          <label>Role</label>
+          <input type="text" name="role">
+        </div>
+
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" name="phone">
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" name="follow_up" value="yes" style="width: 18px; height: 18px;">
+            <span>I'm happy for you to follow up about the results</span>
+          </label>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn btn-secondary" onclick="prevSection()">Back</button>
+          <button type="submit" class="btn btn-primary">Submit & Get Report</button>
+        </div>
+      </div>
+
+      <!-- Completion -->
+      <div class="section" data-section="10">
+        <div class="completion">
+          <div class="completion-icon">✓</div>
+          <h2>Thank you!</h2>
+          <p>Your AI Readiness Report is being generated.</p>
+          <p style="margin-top: 1rem;">We'll email it to you within 24 hours.</p>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let currentSection = 1;
+    const totalSections = 9;
+    const sectionNames = {
+      1: 'Company Basics',
+      2: 'Team Structure',
+      3: 'Data Sources',
+      4: 'Data Sources',
+      5: 'Data Sources',
+      6: 'Pain Signals',
+      7: 'Pain Signals',
+      8: 'Priorities',
+      9: 'Contact'
+    };
+
+    function updateProgress() {
+      const percent = Math.round((currentSection - 1) / totalSections * 100);
+      document.getElementById('progressFill').style.width = percent + '%';
+      document.getElementById('progressPercent').textContent = percent + '%';
+      document.getElementById('sectionName').textContent = sectionNames[currentSection] || '';
+    }
+
+    function showSection(num) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelector(`[data-section="${num}"]`).classList.add('active');
+      currentSection = num;
+      updateProgress();
+      window.scrollTo(0, 0);
+    }
+
+    function nextSection() {
+      if (currentSection < 10) {
+        showSection(currentSection + 1);
+      }
+    }
+
+    function prevSection() {
+      if (currentSection > 1) {
+        showSection(currentSection - 1);
+      }
+    }
+
+    function updateDeptTotal() {
+      const inputs = document.querySelectorAll('.dept-grid input[type="number"]');
+      let total = 0;
+      inputs.forEach(i => total += parseInt(i.value) || 0);
+      document.getElementById('deptTotal').textContent = total;
+
+      // Check against total headcount
+      const headcount = parseInt(document.querySelector('input[name="total_headcount"]').value) || 0;
+      const mismatchEl = document.getElementById('deptMismatch');
+      if (headcount > 0 && total !== headcount) {
+        mismatchEl.style.display = 'inline';
+      } else {
+        mismatchEl.style.display = 'none';
+      }
+    }
+
+    function selectLikert(element, name, value) {
+      const parent = element.parentElement;
+      parent.querySelectorAll('.likert-option').forEach(o => o.classList.remove('selected'));
+      element.classList.add('selected');
+      document.querySelector(`input[name="${name}"]`).value = value;
+    }
+
+    function toggleOtherInput(selectEl, inputId) {
+      const input = document.getElementById(inputId);
+      if (selectEl.value === 'other') {
+        input.style.display = 'block';
+        input.focus();
+      } else {
+        input.style.display = 'none';
+        input.value = '';
+      }
+    }
+
+    // Option item selection
+    document.querySelectorAll('.option-item input').forEach(input => {
+      input.addEventListener('change', function() {
+        const group = this.closest('.options-group');
+        group.querySelectorAll('.option-item').forEach(o => o.classList.remove('selected'));
+        this.closest('.option-item').classList.add('selected');
+      });
+    });
+
+    // Drag and drop for ranking
+    const rankList = document.getElementById('priorityRank');
+    let draggedItem = null;
+
+    rankList.querySelectorAll('.rank-item').forEach(item => {
+      item.addEventListener('dragstart', function() {
+        draggedItem = this;
+        setTimeout(() => this.classList.add('dragging'), 0);
+      });
+
+      item.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+        updateRankNumbers();
+        updateRankInput();
+      });
+
+      item.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(rankList, e.clientY);
+        if (afterElement == null) {
+          rankList.appendChild(draggedItem);
+        } else {
+          rankList.insertBefore(draggedItem, afterElement);
+        }
+      });
+    });
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll('.rank-item:not(.dragging)')];
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function updateRankNumbers() {
+      rankList.querySelectorAll('.rank-item').forEach((item, index) => {
+        item.querySelector('.rank-number').textContent = index + 1;
+      });
+    }
+
+    function updateRankInput() {
+      const order = [...rankList.querySelectorAll('.rank-item')].map(item => item.dataset.value);
+      document.getElementById('priorityRankInput').value = order.join(',');
+    }
+
+    // Supabase config
+    const SUPABASE_URL = 'https://ilfilvcgcfbjielgwwax.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsZmlsdmNnY2ZiamllbGd3d2F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcyNzkwOTMsImV4cCI6MjA4Mjg1NTA5M30._pchOMQMae0RnA36LSqtNIDAER03tB06IiCSMsfnv_I';
+
+    // Form submission
+    document.getElementById('auditForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const data = {};
+
+      // Handle multi-select checkboxes
+      const checkboxGroups = {};
+      formData.forEach((value, key) => {
+        if (this.querySelectorAll(`input[name="${key}"][type="checkbox"]`).length > 1) {
+          // Multi-checkbox group
+          if (!checkboxGroups[key]) checkboxGroups[key] = [];
+          checkboxGroups[key].push(value);
+        } else {
+          data[key] = value;
+        }
+      });
+
+      // Merge checkbox groups
+      Object.keys(checkboxGroups).forEach(key => {
+        data[key] = checkboxGroups[key];
+      });
+
+      console.log('Submitting to Supabase:', data);
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/audit_submissions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            data: data,
+            primary_focus: Array.isArray(data.primary_focus) ? data.primary_focus.join(', ') : data.primary_focus,
+            submitted_at: new Date().toISOString()
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log('Submission successful!');
+        showSection(10);
+      } catch (error) {
+        console.error('Submission failed:', error);
+        alert('Sorry, there was an error submitting your response. Please try again.');
+      }
+    });
+
+    // Initialize
+    updateProgress();
+  </script>
+</body>
+</html>
