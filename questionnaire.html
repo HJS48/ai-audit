@@ -391,7 +391,7 @@
       </div>
     </div>
 
-    <form id="auditForm">
+    <form id="auditForm" novalidate>
       <!-- SECTION 1: Company Basics -->
       <div class="section active" data-section="1">
         <h2 class="section-title">Company Basics</h2>
@@ -1420,7 +1420,35 @@
       window.scrollTo(0, 0);
     }
 
+    function validateCurrentSection() {
+      const section = document.querySelector(`[data-section="${currentSection}"]`);
+      const requiredFields = section.querySelectorAll('[required]');
+      let valid = true;
+      let firstInvalid = null;
+
+      requiredFields.forEach(field => {
+        // Remove previous error styling
+        field.style.borderColor = '';
+
+        if (!field.value || field.value.trim() === '') {
+          valid = false;
+          field.style.borderColor = 'var(--error)';
+          if (!firstInvalid) firstInvalid = field;
+        }
+      });
+
+      if (!valid && firstInvalid) {
+        firstInvalid.focus();
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      return valid;
+    }
+
     function nextSection() {
+      if (!validateCurrentSection()) {
+        return;
+      }
       if (currentSection < 10) {
         showSection(currentSection + 1);
       }
@@ -1533,6 +1561,11 @@
     // Form submission
     document.getElementById('auditForm').addEventListener('submit', async function(e) {
       e.preventDefault();
+
+      // Validate current section first
+      if (!validateCurrentSection()) {
+        return;
+      }
 
       const formData = new FormData(this);
       const data = {};
