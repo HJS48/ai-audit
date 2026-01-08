@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Readiness Audit - Soar Group</title>
+  <style>
+    :root {
+      --color-dying: #ef4444;
+      --color-poor: #f97316;
+      --color-partial: #eab308;
+      --color-healthy: #22c55e;
+      --color-primary: #1e40af;
+      --color-dark: #1f2937;
+      --color-muted: #6b7280;
+      --color-light: #f3f4f6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      color: var(--color-dark);
+      line-height: 1.6;
+      background: #fff;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 40px;
+      page-break-after: always;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Cover Page */
+    .cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+    }
+
+    .cover h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .cover .subtitle {
+      font-size: 1.5rem;
+      opacity: 0.9;
+      margin-bottom: 3rem;
+    }
+
+    .cover .company-name {
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .cover .date {
+      font-size: 1rem;
+      opacity: 0.7;
+    }
+
+    .cover .headline-cost {
+      margin-top: 4rem;
+      padding: 2rem;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+    }
+
+    .cover .headline-cost .label {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.8;
+    }
+
+    .cover .headline-cost .amount {
+      font-size: 4rem;
+      font-weight: 700;
+    }
+
+    /* Section Headers */
+    h2 {
+      font-size: 1.75rem;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid var(--color-primary);
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      color: var(--color-dark);
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: var(--color-dark);
+    }
+
+    .lead {
+      font-size: 1.2rem;
+      color: var(--color-muted);
+      margin-bottom: 2rem;
+    }
+
+    /* Executive Summary Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .summary-card {
+      background: var(--color-light);
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .summary-card.highlight {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .summary-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .summary-card .label {
+      font-size: 0.875rem;
+      color: var(--color-muted);
+      margin-top: 0.25rem;
+    }
+
+    .summary-card.highlight .label {
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* Cost Breakdown */
+    .cost-breakdown {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .cost-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cost-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+    }
+
+    .cost-card.time-bleeding::before { background: var(--color-dying); }
+    .cost-card.missed-deals::before { background: var(--color-poor); }
+    .cost-card.rework::before { background: var(--color-partial); }
+    .cost-card.churn::before { background: var(--color-primary); }
+
+    .cost-card .amount {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--color-dark);
+    }
+
+    .cost-card .title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .cost-card .description {
+      font-size: 0.875rem;
+      color: var(--color-muted);
+    }
+
+    /* Maturity Heatmap */
+    .maturity-grid {
+      display: grid;
+      grid-template-columns: 200px 1fr 60px;
+      gap: 0.5rem;
+      margin: 2rem 0;
+    }
+
+    .maturity-row {
+      display: contents;
+    }
+
+    .maturity-label {
+      font-weight: 500;
+      padding: 0.5rem 0;
+    }
+
+    .maturity-bar-container {
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      height: 28px;
+    }
+
+    .maturity-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    .maturity-bar.dying { background: var(--color-dying); }
+    .maturity-bar.poor { background: var(--color-poor); }
+    .maturity-bar.partial { background: var(--color-partial); }
+    .maturity-bar.healthy { background: var(--color-healthy); }
+
+    .maturity-value {
+      text-align: right;
+      font-weight: 600;
+      padding: 0.5rem 0;
+    }
+
+    /* Pass Map */
+    .pass-map-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .pass-map {
+      background: var(--color-light);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .pass-map h4 {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .pass-map svg {
+      width: 100%;
+      height: auto;
+    }
+
+    /* Flow Table */
+    .flow-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+
+    .flow-table th,
+    .flow-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .flow-table th {
+      background: var(--color-light);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .flow-table td {
+      font-size: 0.9rem;
+    }
+
+    .health-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .health-badge.poor { background: #fef3c7; color: #92400e; }
+    .health-badge.partial { background: #fef9c3; color: #854d0e; }
+    .health-badge.healthy { background: #dcfce7; color: #166534; }
+
+    /* Task Compressions */
+    .task-list {
+      margin: 1.5rem 0;
+    }
+
+    .task-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem;
+      background: var(--color-light);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+
+    .task-item .task-name {
+      font-weight: 500;
+    }
+
+    .task-item .dept {
+      font-size: 0.75rem;
+      color: var(--color-muted);
+    }
+
+    .task-item .time {
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .task-item .time.before {
+      color: var(--color-dying);
+    }
+
+    .task-item .time.after {
+      color: var(--color-healthy);
+    }
+
+    .task-item .reduction {
+      background: var(--color-healthy);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    /* Automation Cards */
+    .automation-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .automation-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .automation-card .name {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .automation-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-healthy);
+    }
+
+    .automation-card .value span {
+      font-size: 0.875rem;
+      color: var(--color-muted);
+      font-weight: 400;
+    }
+
+    .automation-card .stats {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--color-muted);
+    }
+
+    /* Action Plan */
+    .phase {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: var(--color-light);
+      border-radius: 8px;
+      border-left: 4px solid var(--color-primary);
+    }
+
+    .phase h4 {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .phase ul {
+      margin-left: 1.5rem;
+    }
+
+    .phase li {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Footer */
+    .section-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e7eb;
+      font-size: 0.875rem;
+      color: var(--color-muted);
+      text-align: center;
+    }
+
+    /* Callout Box */
+    .callout {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    .callout.warning {
+      background: #fef3c7;
+      border-color: #fcd34d;
+    }
+
+    .callout strong {
+      color: var(--color-primary);
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin: 1rem 0;
+      font-size: 0.875rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .legend-dot.dying { background: var(--color-dying); }
+    .legend-dot.poor { background: var(--color-poor); }
+    .legend-dot.partial { background: var(--color-partial); }
+    .legend-dot.healthy { background: var(--color-healthy); }
+
+    @media print {
+      .page {
+        padding: 40px;
+      }
+
+      .cover {
+        min-height: auto;
+        padding: 100px 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <div class="page cover">
+    <h1>AI Readiness Audit</h1>
+    <p class="subtitle">Knowledge Infrastructure Assessment</p>
+
+    <p class="company-name">Soar Group</p>
+    <p class="date">January 2026</p>
+  </div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="page">
+    <h2>Executive Summary</h2>
+
+    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">Your agency generates <strong>327 types of information</strong> — call notes, campaign learnings, client feedback, creative briefs, performance data, and more.</p>
+
+    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">Of those: <strong style="color: var(--color-healthy);">62</strong> flow freely to the teams that need them. <strong style="color: var(--color-poor);">179</strong> are captured but underutilized. <strong style="color: var(--color-dying);">86</strong> aren't captured at all.</p>
+
+    <h3 style="margin-top: 2rem;">What This Feels Like</h3>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; font-size: 0.95rem;">
+      <div style="padding: 0.75rem; background: #fef2f2; border-radius: 6px;">Time spent searching for info</div>
+      <div style="padding: 0.75rem; background: #fef2f2; border-radius: 6px;">Same questions asked repeatedly</div>
+      <div style="padding: 0.75rem; background: #fef2f2; border-radius: 6px;">New hires slow to ramp</div>
+      <div style="padding: 0.75rem; background: #fef2f2; border-radius: 6px;">Critical info in few heads</div>
+      <div style="padding: 0.75rem; background: #fef2f2; border-radius: 6px;">Sales promises don't reach delivery</div>
+      <div style="padding: 0.75rem; background: #fef2f2; border-radius: 6px;">Warning signs don't reach right people</div>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Where Information Dies</h3>
+    <ul style="font-size: 1rem; line-height: 1.8;">
+      <li><strong>Internal Messaging</strong> — 77 info types vanish into Slack. Decisions made, then lost.</li>
+      <li><strong>File Storage</strong> — 73 info types buried in messy Google Drive. Hard to find the right version.</li>
+      <li><strong>Call Recordings</strong> — 39 info types captured but not searchable. Client context locked in audio.</li>
+    </ul>
+
+    <h3 style="margin-top: 2rem;">This Audit Proposes</h3>
+
+    <div style="margin-bottom: 1.25rem;">
+      <p style="margin: 0 0 0.25rem 0;"><strong>Phase 1: Make Calls Searchable</strong></p>
+      <p style="margin: 0; font-size: 0.95rem; color: var(--color-muted);">Auto-transcribe client calls, extract commitments, make everything searchable by client, topic, or date.</p>
+      <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem;">→ Unlocks 39 info types: client health signals, commitments made, prospect pain points, campaign learnings</p>
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <p style="margin: 0 0 0.25rem 0;"><strong>Phase 2: Capture Slack Decisions</strong></p>
+      <p style="margin: 0; font-size: 0.95rem; color: var(--color-muted);">Archive decisions from channels, index context, flag unresolved threads. Make coordination history findable.</p>
+      <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem;">→ Unlocks 77 info types: handoff details, brief clarifications, delivery issues raised, resource conflicts</p>
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <p style="margin: 0 0 0.25rem 0;"><strong>Phase 3: Make File Knowledge Accessible</strong></p>
+      <p style="margin: 0; font-size: 0.95rem; color: var(--color-muted);">Connect file storage to AI that understands context across all documents. Query briefs, plans, and reports like you'd ask a colleague. Surface insights across campaigns, clients, and history — not just find files, but find answers.</p>
+      <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem;">→ Unlocks 73 info types: creative briefs, media plans, brand guidelines, campaign reports, asset versions</p>
+    </div>
+
+    <div style="background: var(--color-light); border-radius: 8px; padding: 1rem; margin-top: 1.5rem;">
+      <p style="font-size: 1rem; line-height: 1.6; margin: 0;"><strong>Together, these three phases unlock 189 info types</strong> — turning information that's currently trapped or dying into knowledge that flows to the people who need it.</p>
+    </div>
+  </div>
+
+  <!-- SECTION 1: PROBLEM AGITATION -->
+  <div class="page">
+    <h2>The Problem No One's Talking About</h2>
+
+    <p class="lead" style="font-size: 1.3rem; font-weight: 500; color: var(--color-dark);">AI doesn't fail because of AI. It fails because of what's underneath it.</p>
+
+    <p>Every business we speak to, AI is the priority. But when we dig in, we find the same problem: <strong>there isn't a knowledge foundation that allows your business to absorb emerging technology.</strong></p>
+
+    <p>You can't build intelligence on top of chaos.</p>
+
+    <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0;">
+      <h3 style="margin-top: 0; color: #dc2626;">We took a hard look at Soar Group.</h3>
+      <p style="font-size: 1.1rem; margin-bottom: 0.5rem;"><strong>You're leaving 55% of your knowledge infrastructure on the table.</strong></p>
+      <ul style="margin-bottom: 0;">
+        <li>77 information types vanishing in Slack at 23% health</li>
+        <li>4 data sources running below 40% health (Calls, Files, Messaging, Email)</li>
+        <li>11 data sources, only 3 above 75% health</li>
+      </ul>
+    </div>
+
+    <h3>What This Means</h3>
+    <p>This will stall AI implementation. You'll chase quick-wins and tooling that becomes obsolete in 6 months. Meanwhile, agencies that built the foundation will compound ahead of you.</p>
+
+    <p>And no — <strong>another subscription won't fix this.</strong></p>
+
+    <div class="callout">
+      <strong>The question isn't "which AI tools should we buy?"</strong><br>
+      The question is: "Do we have the knowledge foundation to make any of them work?"
+    </div>
+  </div>
+
+  <!-- SECTION 2: DREAM OUTCOME -->
+  <div class="page">
+    <h2>What AI-Enabled Actually Looks Like</h2>
+
+    <p class="lead">This isn't sci-fi. This is what happens when your knowledge foundation works.</p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 2rem 0; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+      <div style="background: #fef2f2; padding: 1.5rem; border-right: 1px solid #e5e7eb;">
+        <h4 style="margin-top: 0; color: #dc2626; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">Today</h4>
+        <ul style="margin: 0; padding-left: 1.25rem; color: #7f1d1d;">
+          <li>"Does anyone have the deck from Q2?"</li>
+          <li>Re-listen to 2 hours of calls to find what was promised</li>
+          <li>New hire takes 3 months to learn client context</li>
+          <li>QBR prep takes 180 minutes of digging</li>
+          <li>Knowledge walks out when people leave</li>
+        </ul>
+      </div>
+      <div style="background: #f0fdf4; padding: 1.5rem;">
+        <h4 style="margin-top: 0; color: #166534; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">AI-Enabled</h4>
+        <ul style="margin: 0; padding-left: 1.25rem; color: #14532d;">
+          <li>"Show me the Q2 deck" → instant</li>
+          <li>"What did we promise Client X?" → answered in seconds</li>
+          <li>New hire queries the system day one</li>
+          <li>QBR prep takes 5 minutes</li>
+          <li>Knowledge persists regardless of who leaves</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>The Real Gain: Capacity Unlocked</h3>
+    <p>Your 180-minute QBR prep becomes 5 minutes. That's not just efficiency — that's <strong>175 minutes of capacity unlocked.</strong></p>
+    <p>The client health checks you weren't doing. The proactive outreach. The strategic thinking that gets squeezed out. You get to do the job properly.</p>
+
+    <h3>How You Get There Matters</h3>
+    <p>Not more subscriptions. Not tools built for everyone, optimized for no one.</p>
+    <p><strong>Custom systems built around your workflows.</strong> Your data, your logic, your IP. Infrastructure that compounds in value, not cost.</p>
+
+    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0;">
+      <p style="margin: 0 0 0.75rem 0;"><strong>The difference:</strong></p>
+      <p style="margin: 0 0 0.5rem 0;">A transcription subscription gives you transcripts. Anyone can buy that.</p>
+      <p style="margin: 0;">A pipeline that captures calls → extracts commitments → flags risks → updates client health → triggers the right person? <strong>That's yours. That's competitive advantage. That's IP.</strong></p>
+    </div>
+  </div>
+
+  <!-- SECTION: HOW WE MEASURED THIS -->
+  <div class="page">
+    <h2>How We Measured This</h2>
+
+    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">We mapped your agency's knowledge infrastructure using a model built in partnership with a market-leading agency — validated against real operational pain.</p>
+
+    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;"><strong>327 information types</strong> — each one mapped based on which department creates it, and which departments could benefit from having access to that information.</p>
+
+    <!-- HTML Diagram -->
+    <div style="background: var(--color-light); border-radius: 12px; padding: 1.5rem; padding-bottom: 5rem; margin: 1.5rem 0;">
+      <table style="margin: 0 auto; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 0.5rem; text-align: center;">
+            <div style="background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem;">Sales</div>
+            <div style="font-size: 0.7rem; color: var(--color-muted); margin-top: 0.25rem;">creates</div>
+          </td>
+          <td style="padding: 0.5rem; color: var(--color-muted);">→</td>
+          <td style="padding: 0.5rem; text-align: center;">
+            <div style="background: var(--color-primary); color: white; border-radius: 6px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem;">Win/Loss Reasons</div>
+            <div style="font-size: 0.7rem; color: var(--color-muted); margin-top: 0.25rem;">info type</div>
+          </td>
+          <td style="padding: 0.5rem; color: var(--color-muted);">→</td>
+          <td style="padding: 0.5rem; text-align: center;">
+            <div style="background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem;">CRM</div>
+            <div style="font-size: 0.7rem; color: var(--color-muted); margin-top: 0.25rem;">stored in</div>
+          </td>
+          <td style="padding: 0.5rem; position: relative;">
+            <div style="color: var(--color-partial); font-size: 1.5rem; font-weight: 700;">→</div>
+            <div style="position: absolute; top: 100%; left: 50%; transform: translateX(-50%); white-space: nowrap;">
+              <div style="width: 2px; height: 20px; background: var(--color-partial); margin: 0 auto;"></div>
+              <div style="background: white; border: 2px solid var(--color-partial); border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.75rem; text-align: center;">
+                <div style="font-weight: 600; color: var(--color-partial);">Scored flow</div>
+                <div style="color: var(--color-muted);">Capture · Connect · Access</div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 0.5rem; text-align: center;">
+            <div style="background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem;">Strategy, Leadership</div>
+            <div style="font-size: 0.7rem; color: var(--color-muted); margin-top: 0.25rem;">needed by</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="font-size: 1.05rem; line-height: 1.8; margin-top: 1.5rem;">Your questionnaire scored each data source's maturity — Capture, Connect, Access. Each of the 327 information types in the model inherits a maturity score from where it's stored.</p>
+
+    <p style="font-size: 1.05rem; line-height: 1.8;">So if CRM scores 50%, then "Win/Loss Reasons" is captured in your CRM, but may not be accessible. Strategy may have to manually check the CRM or ask Sales face to face. High friction, inefficient. Either this information is being used less than optimal by Strategy, or it isn't being used at all in their work.</p>
+
+    <p style="font-size: 1.05rem; line-height: 1.8;">The aggregation of these scores across 327 info types gives your agency's overall flow health.</p>
+  </div>
+
+  <!-- SECTION 3: EDUCATION / GAP -->
+  <div class="page">
+    <h2>The Gap</h2>
+
+    <p class="lead">Every day, your teams create valuable information that other teams need. Sales hears objections that Strategy should know. Media sees what's working that Creative should see. We measured how much of that knowledge actually flows—and how much gets trapped.</p>
+
+    <!-- Flow Health Headline -->
+    <div style="background: var(--color-light); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
+      <div style="font-size: 1.5rem; color: var(--color-dark); line-height: 1.5; margin-bottom: 1rem;">
+        <strong>Soar Group</strong> scored
+        <strong style="font-size: 2.5rem; color: var(--color-primary);">45%</strong> on flow health.
+      </div>
+      <div style="display: flex; gap: 2rem; font-size: 1.1rem;">
+        <div><strong style="font-size: 1.75rem; color: var(--color-healthy);">62</strong> <span style="color: var(--color-muted);">flow freely</span></div>
+        <div><strong style="font-size: 1.75rem; color: var(--color-poor);">179</strong> <span style="color: var(--color-muted);">underutilized</span></div>
+        <div><strong style="font-size: 1.75rem; color: var(--color-dying);">86</strong> <span style="color: var(--color-muted);">not captured</span></div>
+      </div>
+    </div>
+
+    <p>Below is the evidence. The pass map shows how information should flow between departments vs how it actually flows today. The data sources show where information is getting trapped.</p>
+
+    <h3>Your Information Flow (Pass Map)</h3>
+    <p style="font-size: 0.9rem; color: var(--color-muted);">Like a football team's pass map. Thickness = volume of info flowing. Color = health of that flow. Your agency (left) vs potential (right).</p>
+
+    <div class="pass-map-container" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <!-- YOUR AGENCY (LEFT) - Color by health %, thickness by effective -->
+      <div class="pass-map" style="padding: 1rem;">
+        <h4 style="margin-bottom: 0.5rem; text-align: center;">Your Agency (Effective)</h4>
+        <svg viewBox="0 0 520 520" xmlns="http://www.w3.org/2000/svg">
+          <!-- Colors: red <40%, orange 40-55%, yellow 55-70%, green 70%+ -->
+          <line x1="458" y1="288" x2="204" y2="452" stroke="#eab308" stroke-width="6.9" opacity="0.8"/><!-- Media→Strategy eff=13.8 health=63% -->
+          <line x1="442" y1="177" x2="458" y2="288" stroke="#eab308" stroke-width="5.8" opacity="0.8"/><!-- Analytics→Media eff=11.5 health=64% -->
+          <line x1="411" y1="391" x2="316" y2="452" stroke="#eab308" stroke-width="5.2" opacity="0.8"/><!-- Production→Creative eff=10.4 health=65% -->
+          <line x1="411" y1="391" x2="109" y2="391" stroke="#16a34a" stroke-width="4.3" opacity="0.8"/><!-- Production→Operations eff=8.5 health=85% -->
+          <line x1="62" y1="288" x2="78" y2="177" stroke="#f97316" stroke-width="4.1" opacity="0.8"/><!-- HR→Leadership eff=8.1 health=40% -->
+          <line x1="442" y1="177" x2="368" y2="92" stroke="#eab308" stroke-width="4.0" opacity="0.8"/><!-- Analytics→AM eff=8.0 health=66% -->
+          <line x1="411" y1="391" x2="368" y2="92" stroke="#eab308" stroke-width="3.6" opacity="0.8"/><!-- Production→AM eff=7.1 health=59% -->
+          <line x1="442" y1="177" x2="204" y2="452" stroke="#16a34a" stroke-width="3.5" opacity="0.8"/><!-- Analytics→Strategy eff=7.0 health=70% -->
+          <line x1="458" y1="288" x2="316" y2="452" stroke="#eab308" stroke-width="3.5" opacity="0.8"/><!-- Media→Creative eff=6.9 health=63% -->
+          <line x1="109" y1="391" x2="78" y2="177" stroke="#f97316" stroke-width="3.4" opacity="0.8"/><!-- Operations→Leadership eff=6.8 health=40% -->
+          <line x1="152" y1="92" x2="78" y2="177" stroke="#f97316" stroke-width="3.4" opacity="0.8"/><!-- Finance→Leadership eff=6.7 health=42% -->
+          <line x1="458" y1="288" x2="368" y2="92" stroke="#f97316" stroke-width="3.3" opacity="0.8"/><!-- Media→AM eff=6.6 health=47% -->
+          <line x1="442" y1="177" x2="78" y2="177" stroke="#eab308" stroke-width="3.1" opacity="0.8"/><!-- Analytics→Leadership eff=6.2 health=62% -->
+          <line x1="152" y1="92" x2="368" y2="92" stroke="#f97316" stroke-width="3.1" opacity="0.8"/><!-- Finance→AM eff=6.1 health=43% -->
+          <line x1="458" y1="288" x2="152" y2="92" stroke="#f97316" stroke-width="3.0" opacity="0.8"/><!-- Media→Finance eff=5.9 health=49% -->
+          <line x1="204" y1="452" x2="316" y2="452" stroke="#dc2626" stroke-width="2.8" opacity="0.8"/><!-- Strategy→Creative eff=5.6 health=33% -->
+          <line x1="458" y1="288" x2="78" y2="177" stroke="#eab308" stroke-width="2.8" opacity="0.8"/><!-- Media→Leadership eff=5.6 health=56% -->
+          <line x1="62" y1="288" x2="109" y2="391" stroke="#f97316" stroke-width="2.7" opacity="0.8"/><!-- HR→Operations eff=5.3 health=44% -->
+          <line x1="458" y1="288" x2="442" y2="177" stroke="#eab308" stroke-width="2.7" opacity="0.8"/><!-- Media→Analytics eff=5.3 health=59% -->
+          <line x1="411" y1="391" x2="458" y2="288" stroke="#16a34a" stroke-width="2.6" opacity="0.8"/><!-- Production→Media eff=5.2 health=75% -->
+          <line x1="411" y1="391" x2="152" y2="92" stroke="#16a34a" stroke-width="2.6" opacity="0.8"/><!-- Production→Finance eff=5.1 health=72% -->
+          <line x1="260" y1="60" x2="204" y2="452" stroke="#dc2626" stroke-width="2.5" opacity="0.8"/><!-- Sales→Strategy eff=4.9 health=38% -->
+          <line x1="368" y1="92" x2="78" y2="177" stroke="#dc2626" stroke-width="2.4" opacity="0.8"/><!-- AM→Leadership eff=4.8 health=37% -->
+          <line x1="411" y1="391" x2="78" y2="177" stroke="#16a34a" stroke-width="2.4" opacity="0.8"/><!-- Production→Leadership eff=4.7 health=78% -->
+          <line x1="368" y1="92" x2="260" y2="60" stroke="#f97316" stroke-width="2.0" opacity="0.8"/><!-- AM→Sales eff=4.0 health=50% -->
+          <line x1="109" y1="391" x2="62" y2="288" stroke="#f97316" stroke-width="2.0" opacity="0.8"/><!-- Operations→HR eff=3.9 health=48% -->
+          <line x1="78" y1="177" x2="62" y2="288" stroke="#dc2626" stroke-width="1.8" opacity="0.8"/><!-- Leadership→HR eff=3.6 health=32% -->
+          <line x1="78" y1="177" x2="109" y2="391" stroke="#dc2626" stroke-width="1.8" opacity="0.8"/><!-- Leadership→Operations eff=3.6 health=36% -->
+          <line x1="204" y1="452" x2="458" y2="288" stroke="#dc2626" stroke-width="1.7" opacity="0.8"/><!-- Strategy→Media eff=3.3 health=33% -->
+          <line x1="204" y1="452" x2="368" y2="92" stroke="#dc2626" stroke-width="1.7" opacity="0.8"/><!-- Strategy→AM eff=3.3 health=37% -->
+          <line x1="260" y1="60" x2="78" y2="177" stroke="#f97316" stroke-width="1.6" opacity="0.8"/><!-- Sales→Leadership eff=3.2 health=40% -->
+          <line x1="316" y1="452" x2="411" y2="391" stroke="#dc2626" stroke-width="1.6" opacity="0.8"/><!-- Creative→Production eff=3.2 health=29% -->
+          <line x1="368" y1="92" x2="204" y2="452" stroke="#dc2626" stroke-width="1.6" opacity="0.8"/><!-- AM→Strategy eff=3.1 health=38% -->
+          <line x1="368" y1="92" x2="316" y2="452" stroke="#f97316" stroke-width="1.6" opacity="0.8"/><!-- AM→Creative eff=3.1 health=45% -->
+          <line x1="152" y1="92" x2="260" y2="60" stroke="#f97316" stroke-width="1.4" opacity="0.8"/><!-- Finance→Sales eff=2.8 health=40% -->
+          <line x1="204" y1="452" x2="260" y2="60" stroke="#dc2626" stroke-width="1.4" opacity="0.8"/><!-- Strategy→Sales eff=2.7 health=38% -->
+          <line x1="316" y1="452" x2="204" y2="452" stroke="#dc2626" stroke-width="1.4" opacity="0.8"/><!-- Creative→Strategy eff=2.7 health=38% -->
+          <line x1="368" y1="92" x2="109" y2="391" stroke="#f97316" stroke-width="1.4" opacity="0.8"/><!-- AM→Operations eff=2.7 health=45% -->
+          <line x1="109" y1="391" x2="368" y2="92" stroke="#dc2626" stroke-width="1.4" opacity="0.8"/><!-- Operations→AM eff=2.7 health=39% -->
+          <line x1="260" y1="60" x2="368" y2="92" stroke="#dc2626" stroke-width="1.3" opacity="0.8"/><!-- Sales→AM eff=2.6 health=32% -->
+          <line x1="368" y1="92" x2="458" y2="288" stroke="#f97316" stroke-width="1.3" opacity="0.8"/><!-- AM→Media eff=2.5 health=51% -->
+          <line x1="204" y1="452" x2="442" y2="177" stroke="#dc2626" stroke-width="1.3" opacity="0.8"/><!-- Strategy→Analytics eff=2.5 health=31% -->
+          <line x1="316" y1="452" x2="458" y2="288" stroke="#f97316" stroke-width="1.2" opacity="0.8"/><!-- Creative→Media eff=2.4 health=40% -->
+          <line x1="109" y1="391" x2="152" y2="92" stroke="#f97316" stroke-width="1.2" opacity="0.8"/><!-- Operations→Finance eff=2.4 health=41% -->
+          <line x1="152" y1="92" x2="109" y2="391" stroke="#f97316" stroke-width="1.2" opacity="0.8"/><!-- Finance→Operations eff=2.4 health=40% -->
+          <line x1="78" y1="177" x2="260" y2="60" stroke="#dc2626" stroke-width="1.2" opacity="0.8"/><!-- Leadership→Sales eff=2.3 health=33% -->
+          <line x1="152" y1="92" x2="62" y2="288" stroke="#f97316" stroke-width="1.2" opacity="0.8"/><!-- Finance→HR eff=2.3 health=46% -->
+          <line x1="62" y1="288" x2="152" y2="92" stroke="#f97316" stroke-width="1.2" opacity="0.8"/><!-- HR→Finance eff=2.3 health=46% -->
+          <line x1="260" y1="60" x2="316" y2="452" stroke="#dc2626" stroke-width="1.2" opacity="0.8"/><!-- Sales→Creative eff=2.3 health=39% -->
+          <line x1="109" y1="391" x2="411" y2="391" stroke="#f97316" stroke-width="1.1" opacity="0.8"/><!-- Operations→Production eff=2.1 health=43% -->
+          <line x1="316" y1="452" x2="368" y2="92" stroke="#dc2626" stroke-width="1.1" opacity="0.8"/><!-- Creative→AM eff=2.1 health=23% -->
+          <line x1="78" y1="177" x2="204" y2="452" stroke="#dc2626" stroke-width="1.0" opacity="0.8"/><!-- Leadership→Strategy eff=1.9 health=39% -->
+          <line x1="204" y1="452" x2="78" y2="177" stroke="#dc2626" stroke-width="0.9" opacity="0.8"/><!-- Strategy→Leadership eff=1.8 health=37% -->
+
+          <!-- Department nodes -->
+          <circle cx="260" cy="60" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="260" y="64" text-anchor="middle" font-size="9" font-weight="600">Sales</text>
+          <circle cx="368" cy="92" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="368" y="96" text-anchor="middle" font-size="9" font-weight="600">AM</text>
+          <circle cx="442" cy="177" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="442" y="181" text-anchor="middle" font-size="8" font-weight="600">Analytics</text>
+          <circle cx="458" cy="288" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="458" y="292" text-anchor="middle" font-size="9" font-weight="600">Media</text>
+          <circle cx="411" cy="391" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="411" y="395" text-anchor="middle" font-size="8" font-weight="600">Production</text>
+          <circle cx="316" cy="452" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="316" y="456" text-anchor="middle" font-size="9" font-weight="600">Creative</text>
+          <circle cx="204" cy="452" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="204" y="456" text-anchor="middle" font-size="9" font-weight="600">Strategy</text>
+          <circle cx="109" cy="391" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="109" y="395" text-anchor="middle" font-size="8" font-weight="600">Operations</text>
+          <circle cx="62" cy="288" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="62" y="292" text-anchor="middle" font-size="9" font-weight="600">HR</text>
+          <circle cx="78" cy="177" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="78" y="181" text-anchor="middle" font-size="8" font-weight="600">Leadership</text>
+          <circle cx="152" cy="92" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="152" y="96" text-anchor="middle" font-size="9" font-weight="600">Finance</text>
+        </svg>
+      </div>
+
+      <!-- POTENTIAL (RIGHT) - All green, thickness by potential -->
+      <div class="pass-map" style="padding: 1rem;">
+        <h4 style="margin-bottom: 0.5rem; text-align: center;">Potential</h4>
+        <svg viewBox="0 0 520 520" xmlns="http://www.w3.org/2000/svg">
+          <!-- Flows all green, thickness by potential score (pot/3.5) -->
+          <line x1="458" y1="288" x2="204" y2="452" stroke="#16a34a" stroke-width="6.3" opacity="0.8"/><!-- Media→Strategy pot=22 -->
+          <line x1="62" y1="288" x2="78" y2="177" stroke="#16a34a" stroke-width="5.7" opacity="0.8"/><!-- HR→Leadership pot=20 -->
+          <line x1="442" y1="177" x2="458" y2="288" stroke="#16a34a" stroke-width="5.1" opacity="0.8"/><!-- Analytics→Media pot=18 -->
+          <line x1="204" y1="452" x2="316" y2="452" stroke="#16a34a" stroke-width="4.9" opacity="0.8"/><!-- Strategy→Creative pot=17 -->
+          <line x1="109" y1="391" x2="78" y2="177" stroke="#16a34a" stroke-width="4.9" opacity="0.8"/><!-- Operations→Leadership pot=17 -->
+          <line x1="411" y1="391" x2="316" y2="452" stroke="#16a34a" stroke-width="4.6" opacity="0.8"/><!-- Production→Creative pot=16 -->
+          <line x1="152" y1="92" x2="78" y2="177" stroke="#16a34a" stroke-width="4.6" opacity="0.8"/><!-- Finance→Leadership pot=16 -->
+          <line x1="458" y1="288" x2="368" y2="92" stroke="#22c55e" stroke-width="4.0" opacity="0.8"/><!-- Media→AM pot=14 -->
+          <line x1="152" y1="92" x2="368" y2="92" stroke="#22c55e" stroke-width="4.0" opacity="0.8"/><!-- Finance→AM pot=14 -->
+          <line x1="260" y1="60" x2="204" y2="452" stroke="#22c55e" stroke-width="3.7" opacity="0.8"/><!-- Sales→Strategy pot=13 -->
+          <line x1="368" y1="92" x2="78" y2="177" stroke="#22c55e" stroke-width="3.7" opacity="0.8"/><!-- AM→Leadership pot=13 -->
+          <line x1="442" y1="177" x2="368" y2="92" stroke="#22c55e" stroke-width="3.4" opacity="0.8"/><!-- Analytics→AM pot=12 -->
+          <line x1="411" y1="391" x2="368" y2="92" stroke="#22c55e" stroke-width="3.4" opacity="0.8"/><!-- Production→AM pot=12 -->
+          <line x1="458" y1="288" x2="152" y2="92" stroke="#22c55e" stroke-width="3.4" opacity="0.8"/><!-- Media→Finance pot=12 -->
+          <line x1="62" y1="288" x2="109" y2="391" stroke="#22c55e" stroke-width="3.4" opacity="0.8"/><!-- HR→Operations pot=12 -->
+          <line x1="458" y1="288" x2="316" y2="452" stroke="#22c55e" stroke-width="3.1" opacity="0.8"/><!-- Media→Creative pot=11 -->
+          <line x1="316" y1="452" x2="411" y2="391" stroke="#22c55e" stroke-width="3.1" opacity="0.8"/><!-- Creative→Production pot=11 -->
+          <line x1="78" y1="177" x2="62" y2="288" stroke="#22c55e" stroke-width="3.1" opacity="0.8"/><!-- Leadership→HR pot=11 -->
+          <line x1="442" y1="177" x2="204" y2="452" stroke="#4ade80" stroke-width="2.9" opacity="0.8"/><!-- Analytics→Strategy pot=10 -->
+          <line x1="442" y1="177" x2="78" y2="177" stroke="#4ade80" stroke-width="2.9" opacity="0.8"/><!-- Analytics→Leadership pot=10 -->
+          <line x1="458" y1="288" x2="78" y2="177" stroke="#4ade80" stroke-width="2.9" opacity="0.8"/><!-- Media→Leadership pot=10 -->
+          <line x1="411" y1="391" x2="109" y2="391" stroke="#4ade80" stroke-width="2.9" opacity="0.8"/><!-- Production→Operations pot=10 -->
+          <line x1="204" y1="452" x2="458" y2="288" stroke="#4ade80" stroke-width="2.9" opacity="0.8"/><!-- Strategy→Media pot=10 -->
+          <line x1="78" y1="177" x2="109" y2="391" stroke="#4ade80" stroke-width="2.9" opacity="0.8"/><!-- Leadership→Operations pot=10 -->
+          <line x1="458" y1="288" x2="442" y2="177" stroke="#84cc16" stroke-width="2.6" opacity="0.8"/><!-- Media→Analytics pot=9 -->
+          <line x1="316" y1="452" x2="368" y2="92" stroke="#84cc16" stroke-width="2.6" opacity="0.8"/><!-- Creative→AM pot=9 -->
+          <line x1="204" y1="452" x2="368" y2="92" stroke="#84cc16" stroke-width="2.6" opacity="0.8"/><!-- Strategy→AM pot=9 -->
+          <line x1="260" y1="60" x2="368" y2="92" stroke="#84cc16" stroke-width="2.3" opacity="0.8"/><!-- Sales→AM pot=8 -->
+          <line x1="368" y1="92" x2="260" y2="60" stroke="#84cc16" stroke-width="2.3" opacity="0.8"/><!-- AM→Sales pot=8 -->
+          <line x1="368" y1="92" x2="204" y2="452" stroke="#84cc16" stroke-width="2.3" opacity="0.8"/><!-- AM→Strategy pot=8 -->
+          <line x1="260" y1="60" x2="78" y2="177" stroke="#84cc16" stroke-width="2.3" opacity="0.8"/><!-- Sales→Leadership pot=8 -->
+          <line x1="109" y1="391" x2="62" y2="288" stroke="#84cc16" stroke-width="2.3" opacity="0.8"/><!-- Operations→HR pot=8 -->
+          <line x1="204" y1="452" x2="442" y2="177" stroke="#84cc16" stroke-width="2.3" opacity="0.8"/><!-- Strategy→Analytics pot=8 -->
+          <line x1="368" y1="92" x2="316" y2="452" stroke="#a3e635" stroke-width="2.0" opacity="0.8"/><!-- AM→Creative pot=7 -->
+          <line x1="109" y1="391" x2="368" y2="92" stroke="#a3e635" stroke-width="2.0" opacity="0.8"/><!-- Operations→AM pot=7 -->
+          <line x1="152" y1="92" x2="260" y2="60" stroke="#a3e635" stroke-width="2.0" opacity="0.8"/><!-- Finance→Sales pot=7 -->
+          <line x1="411" y1="391" x2="152" y2="92" stroke="#a3e635" stroke-width="2.0" opacity="0.8"/><!-- Production→Finance pot=7 -->
+          <line x1="411" y1="391" x2="458" y2="288" stroke="#a3e635" stroke-width="2.0" opacity="0.8"/><!-- Production→Media pot=7 -->
+          <line x1="316" y1="452" x2="204" y2="452" stroke="#a3e635" stroke-width="2.0" opacity="0.8"/><!-- Creative→Strategy pot=7 -->
+          <line x1="78" y1="177" x2="260" y2="60" stroke="#a3e635" stroke-width="2.0" opacity="0.8"/><!-- Leadership→Sales pot=7 -->
+          <line x1="204" y1="452" x2="260" y2="60" stroke="#a3e635" stroke-width="2.0" opacity="0.8"/><!-- Strategy→Sales pot=7 -->
+          <line x1="316" y1="452" x2="458" y2="288" stroke="#a3e635" stroke-width="1.7" opacity="0.8"/><!-- Creative→Media pot=6 -->
+          <line x1="368" y1="92" x2="109" y2="391" stroke="#a3e635" stroke-width="1.7" opacity="0.8"/><!-- AM→Operations pot=6 -->
+          <line x1="260" y1="60" x2="316" y2="452" stroke="#a3e635" stroke-width="1.7" opacity="0.8"/><!-- Sales→Creative pot=6 -->
+          <line x1="109" y1="391" x2="152" y2="92" stroke="#a3e635" stroke-width="1.7" opacity="0.8"/><!-- Operations→Finance pot=6 -->
+          <line x1="152" y1="92" x2="109" y2="391" stroke="#a3e635" stroke-width="1.7" opacity="0.8"/><!-- Finance→Operations pot=6 -->
+          <line x1="411" y1="391" x2="78" y2="177" stroke="#a3e635" stroke-width="1.7" opacity="0.8"/><!-- Production→Leadership pot=6 -->
+
+          <!-- Department nodes -->
+          <circle cx="260" cy="60" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="260" y="64" text-anchor="middle" font-size="9" font-weight="600">Sales</text>
+          <circle cx="368" cy="92" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="368" y="96" text-anchor="middle" font-size="9" font-weight="600">AM</text>
+          <circle cx="442" cy="177" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="442" y="181" text-anchor="middle" font-size="8" font-weight="600">Analytics</text>
+          <circle cx="458" cy="288" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="458" y="292" text-anchor="middle" font-size="9" font-weight="600">Media</text>
+          <circle cx="411" cy="391" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="411" y="395" text-anchor="middle" font-size="8" font-weight="600">Production</text>
+          <circle cx="316" cy="452" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="316" y="456" text-anchor="middle" font-size="9" font-weight="600">Creative</text>
+          <circle cx="204" cy="452" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="204" y="456" text-anchor="middle" font-size="9" font-weight="600">Strategy</text>
+          <circle cx="109" cy="391" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="109" y="395" text-anchor="middle" font-size="8" font-weight="600">Operations</text>
+          <circle cx="62" cy="288" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="62" y="292" text-anchor="middle" font-size="9" font-weight="600">HR</text>
+          <circle cx="78" cy="177" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="78" y="181" text-anchor="middle" font-size="8" font-weight="600">Leadership</text>
+          <circle cx="152" cy="92" r="22" fill="white" stroke="#374151" stroke-width="2"/>
+          <text x="152" y="96" text-anchor="middle" font-size="9" font-weight="600">Finance</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Color scale legend -->
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem; margin: 1rem 0; font-size: 0.8rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-weight: 600;">Health:</span>
+        <span style="color: #dc2626;">&#9679;</span><span>&lt;40%</span>
+        <span style="color: #f97316;">&#9679;</span><span>40-55%</span>
+        <span style="color: #eab308;">&#9679;</span><span>55-70%</span>
+        <span style="color: #22c55e;">&#9679;</span><span>70%+</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-weight: 600;">Thickness:</span>
+        <span>= volume of info (1-22 types)</span>
+      </div>
+    </div>
+
+    <!-- Department Information Flow -->
+    <h3 style="margin-top: 2rem;">Where Information Gets Lost By Department</h3>
+    <p style="color: #6b7280; margin-bottom: 1rem;">The same gap, sliced by department. Sends and receives show what <em>could</em> flow. Health and gap show what <em>actually</em> does.</p>
+
+    <table class="flow-table">
+      <thead>
+        <tr>
+          <th>Department</th>
+          <th style="color: #6b7280;">Sends</th>
+          <th style="color: #6b7280;">Receives</th>
+          <th>Health</th>
+          <th>Gap</th>
+        </tr>
+        <tr style="font-size: 0.7rem; color: #9ca3af; font-weight: normal;">
+          <th></th>
+          <th colspan="2">potential</th>
+          <th colspan="2">your agency</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background: #fef2f2;">
+          <td><strong>HR</strong></td>
+          <td>40</td>
+          <td>25</td>
+          <td><span class="health-badge poor" style="background: #fee2e2; color: #dc2626;">36%</span></td>
+          <td style="color: #dc2626; font-weight: 600;">64%</td>
+        </tr>
+        <tr style="background: #fef2f2;">
+          <td><strong>Sales</strong></td>
+          <td>43</td>
+          <td>34</td>
+          <td><span class="health-badge poor" style="background: #fee2e2; color: #dc2626;">38%</span></td>
+          <td style="color: #dc2626; font-weight: 600;">62%</td>
+        </tr>
+        <tr>
+          <td><strong>Finance</strong></td>
+          <td>52</td>
+          <td>49</td>
+          <td><span class="health-badge partial" style="background: #fef3c7; color: #d97706;">40%</span></td>
+          <td style="color: #d97706; font-weight: 600;">60%</td>
+        </tr>
+        <tr>
+          <td><strong>Strategy</strong></td>
+          <td>57</td>
+          <td>65</td>
+          <td><span class="health-badge partial" style="background: #fef3c7; color: #d97706;">41%</span></td>
+          <td style="color: #d97706; font-weight: 600;">59%</td>
+        </tr>
+        <tr>
+          <td><strong>Leadership</strong></td>
+          <td>43</td>
+          <td>105</td>
+          <td><span class="health-badge partial" style="background: #fef3c7; color: #d97706;">41%</span></td>
+          <td style="color: #d97706; font-weight: 600;">59%</td>
+        </tr>
+        <tr>
+          <td><strong>Account Mgmt</strong></td>
+          <td>53</td>
+          <td>91</td>
+          <td><span class="health-badge partial" style="background: #fef3c7; color: #d97706;">42%</span></td>
+          <td style="color: #d97706; font-weight: 600;">58%</td>
+        </tr>
+        <tr>
+          <td><strong>Creative</strong></td>
+          <td>37</td>
+          <td>60</td>
+          <td><span class="health-badge partial" style="background: #fef3c7; color: #d97706;">44%</span></td>
+          <td style="color: #d97706; font-weight: 600;">56%</td>
+        </tr>
+        <tr>
+          <td><strong>Operations</strong></td>
+          <td>49</td>
+          <td>49</td>
+          <td><span class="health-badge partial" style="background: #fef3c7; color: #d97706;">47%</span></td>
+          <td style="color: #d97706; font-weight: 600;">53%</td>
+        </tr>
+        <tr>
+          <td><strong>Media</strong></td>
+          <td>81</td>
+          <td>49</td>
+          <td><span class="health-badge partial" style="background: #fef3c7; color: #d97706;">49%</span></td>
+          <td style="color: #d97706; font-weight: 600;">51%</td>
+        </tr>
+        <tr>
+          <td><strong>Production</strong></td>
+          <td>59</td>
+          <td>21</td>
+          <td><span class="health-badge partial" style="background: #fef3c7; color: #d97706;">49%</span></td>
+          <td style="color: #d97706; font-weight: 600;">51%</td>
+        </tr>
+        <tr>
+          <td><strong>Analytics</strong></td>
+          <td>54</td>
+          <td>20</td>
+          <td><span class="health-badge healthy" style="background: #dcfce7; color: #166534;">56%</span></td>
+          <td style="color: #166534; font-weight: 600;">44%</td>
+        </tr>
+      </tbody>
+      <tfoot style="background: #fef2f2; font-weight: 600;">
+        <tr>
+          <td>All Departments</td>
+          <td>568</td>
+          <td>568</td>
+          <td>44%</td>
+          <td style="color: #dc2626;">56% lost</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="callout">
+      <strong>HR and Sales have the biggest gaps</strong> — at 36% and 38% health, critical info about people and prospects isn't reaching the teams that need it. Leadership receives from 105 flows but only at 41% health.
+    </div>
+  </div>
+
+  <!-- SECTION 3 CONTINUED: DATA SOURCES -->
+  <div class="page">
+    <h3 style="margin-top: 0;">Your Data Sources: Where Information Gets Trapped</h3>
+
+    <p>Info types show what <em>could</em> flow from each source. Health and gap show what <em>actually</em> does.</p>
+
+    <table class="flow-table">
+      <thead>
+        <tr>
+          <th>Data Source</th>
+          <th style="color: #6b7280;">Info Types</th>
+          <th>Health</th>
+          <th>Gap</th>
+        </tr>
+        <tr style="font-size: 0.7rem; color: #9ca3af; font-weight: normal;">
+          <th></th>
+          <th>potential</th>
+          <th colspan="2">your agency</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background: #fef2f2;">
+          <td><strong>Email</strong></td>
+          <td>9</td>
+          <td><span class="health-badge poor" style="background: #fee2e2; color: #dc2626;">8%</span></td>
+          <td style="color: #dc2626; font-weight: 600;">92%</td>
+        </tr>
+        <tr style="background: #fef2f2;">
+          <td><strong>Internal Messaging</strong></td>
+          <td>77</td>
+          <td><span class="health-badge poor" style="background: #fee2e2; color: #dc2626;">23%</span></td>
+          <td style="color: #dc2626; font-weight: 600;">77%</td>
+        </tr>
+        <tr style="background: #fef2f2;">
+          <td><strong>File Storage</strong></td>
+          <td>73</td>
+          <td><span class="health-badge poor" style="background: #fee2e2; color: #dc2626;">30%</span></td>
+          <td style="color: #dc2626; font-weight: 600;">70%</td>
+        </tr>
+        <tr style="background: #fef2f2;">
+          <td><strong>Call Recordings</strong></td>
+          <td>39</td>
+          <td><span class="health-badge poor" style="background: #fee2e2; color: #dc2626;">37%</span></td>
+          <td style="color: #dc2626; font-weight: 600;">63%</td>
+        </tr>
+        <tr>
+          <td><strong>CRM</strong></td>
+          <td>16</td>
+          <td><span class="health-badge partial">55%</span></td>
+          <td style="color: #ea580c; font-weight: 600;">45%</td>
+        </tr>
+        <tr>
+          <td><strong>Docs & Wikis</strong></td>
+          <td>25</td>
+          <td><span class="health-badge partial">55%</span></td>
+          <td style="color: #ea580c; font-weight: 600;">45%</td>
+        </tr>
+        <tr>
+          <td><strong>HR System</strong></td>
+          <td>14</td>
+          <td><span class="health-badge partial">55%</span></td>
+          <td style="color: #ea580c;">45%</td>
+        </tr>
+        <tr>
+          <td><strong>Finance System</strong></td>
+          <td>12</td>
+          <td><span class="health-badge partial">55%</span></td>
+          <td style="color: #ea580c;">45%</td>
+        </tr>
+        <tr>
+          <td><strong>Ad Platforms</strong></td>
+          <td>20</td>
+          <td><span class="health-badge healthy">77%</span></td>
+          <td style="color: #ca8a04;">23%</td>
+        </tr>
+        <tr>
+          <td><strong>PM Tools</strong></td>
+          <td>27</td>
+          <td><span class="health-badge healthy">89%</span></td>
+          <td style="color: #22c55e;">11%</td>
+        </tr>
+        <tr>
+          <td><strong>Analytics</strong></td>
+          <td>15</td>
+          <td><span class="health-badge healthy">100%</span></td>
+          <td style="color: #22c55e;">0%</td>
+        </tr>
+      </tbody>
+      <tfoot style="background: #fef2f2; font-weight: 600;">
+        <tr>
+          <td>All Sources</td>
+          <td>327</td>
+          <td>45%</td>
+          <td style="color: #dc2626;">55% lost</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="callout warning">
+      <strong>Internal Messaging is your biggest gap.</strong> 77 information types at only 23% health — decisions made in Slack, then vanish. File Storage close behind at 30% with 73 info types.
+    </div>
+  </div>
+
+  <!-- SECTION 3 CONTINUED: KEY FINDINGS -->
+  <div class="page">
+    <h3 style="margin-top: 0;">What We Found</h3>
+
+    <!-- Finding 1: Where Information Dies -->
+    <div style="background: #fef2f2; border-left: 4px solid var(--color-dying); padding: 1.25rem 1.5rem; margin-bottom: 1rem; border-radius: 0 8px 8px 0;">
+      <div style="font-weight: 600; color: var(--color-dying); margin-bottom: 0.5rem;">Decision Memory</div>
+      <p style="margin: 0; color: var(--color-dark);"><strong>Internal Messaging.</strong> 77 info types—decisions made, context shared, problems solved. Your Slack is a living record of how work actually gets done. At 23% health, this institutional memory isn't searchable.</p>
+    </div>
+
+    <!-- Finding 2: Captured But Trapped -->
+    <div style="background: #fff7ed; border-left: 4px solid var(--color-poor); padding: 1.25rem 1.5rem; margin-bottom: 1rem; border-radius: 0 8px 8px 0;">
+      <div style="font-weight: 600; color: var(--color-poor); margin-bottom: 0.5rem;">Client Intelligence</div>
+      <p style="margin: 0; color: var(--color-dark);"><strong>Call Recordings.</strong> 39 info types captured in Fireflies—client context, commitments made, buying signals, feedback on creative. The raw material for understanding what clients actually want. At 37% health, it's locked in audio.</p>
+    </div>
+
+    <!-- Finding 3: Critical Gap -->
+    <div style="background: #fefce8; border-left: 4px solid #ca8a04; padding: 1.25rem 1.5rem; margin-bottom: 1rem; border-radius: 0 8px 8px 0;">
+      <div style="font-weight: 600; color: #ca8a04; margin-bottom: 0.5rem;">Treasure Trove</div>
+      <p style="margin: 0; color: var(--color-dark);"><strong>File Storage.</strong> 73 info types—every brief, media plan, campaign report you've ever created. A treasure trove of patterns, learnings, and institutional knowledge. At 30% health, these insights aren't being surfaced.</p>
+    </div>
+
+    <!-- Finding 4: What's Working -->
+    <div style="background: #f0fdf4; border-left: 4px solid var(--color-healthy); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; border-radius: 0 8px 8px 0;">
+      <div style="font-weight: 600; color: var(--color-healthy); margin-bottom: 0.5rem;">What's Working</div>
+      <p style="margin: 0; color: var(--color-dark);"><strong>Triple Whale dashboards, Notion PM, and ad platform data already flowing well.</strong> Analytics at 100%, PM at 89%, Ad Platforms at 77%. These are your foundation to build on.</p>
+    </div>
+
+  </div>
+
+  <!-- SECTION 4: THE OPPORTUNITY -->
+  <div class="page">
+    <h2>The Opportunity</h2>
+
+    <div style="background: var(--color-light); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
+      <p style="font-size: 1.3rem; color: var(--color-dark); margin: 0; line-height: 1.6;">
+        When information flows, your <strong>85-person agency</strong> stops operating like <strong style="color: var(--color-dying);">72</strong> and starts operating like <strong style="color: var(--color-healthy);">111</strong>. Not by working harder—by not losing what you already know.
+      </p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 1.5rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--color-primary);">
+          <th style="text-align: left; padding: 0.75rem 0.5rem; color: var(--color-primary);">Your Data</th>
+          <th style="text-align: left; padding: 0.75rem 0.5rem; color: var(--color-primary);">The Opportunity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 1rem 0.5rem;"><strong>34 clients</strong> lost last year</td>
+          <td style="padding: 1rem 0.5rem; color: var(--color-muted);">How many could you save if warning signs were visible?</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 1rem 0.5rem;"><strong>25-40%</strong> pitch win rate</td>
+          <td style="padding: 1rem 0.5rem; color: var(--color-muted);">How many more with full context on what worked?</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 1rem 0.5rem;"><strong>2 revision rounds</strong> per project</td>
+          <td style="padding: 1rem 0.5rem; color: var(--color-muted);">How many fewer if briefs arrived complete?</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 1rem 0.5rem;"><strong>11 people</strong> left in the last 12 months</td>
+          <td style="padding: 1rem 0.5rem; color: var(--color-muted);">How much knowledge walked out the door?</td>
+        </tr>
+        <tr>
+          <td style="padding: 1rem 0.5rem;"><strong>47 active clients</strong> across 75 projects/year</td>
+          <td style="padding: 1rem 0.5rem; color: var(--color-muted);">What would you do with better visibility across all of them?</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- YOUR ROADMAP -->
+    <h3 style="color: var(--color-primary); margin-top: 2.5rem; border-bottom: 2px solid var(--color-primary); padding-bottom: 0.5rem;">Your Roadmap: 45% → 78% Flow Health</h3>
+    <p style="color: var(--color-muted); margin-bottom: 2rem;">Three phases. Each one unlocks the next. Here's the sequence, ordered by impact.</p>
+
+    <!-- PHASE 1 -->
+    <div style="border-left: 4px solid var(--color-healthy); padding-left: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <h4 style="margin: 0; color: var(--color-dark); font-size: 1.1rem;">Phase 1: Make Calls Searchable</h4>
+        <span style="background: var(--color-healthy); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Week 1-2</span>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--color-healthy); margin-bottom: 0.75rem;">45% → 51% flow health · Low effort</div>
+      <p style="margin-bottom: 0.75rem;"><strong>39 types of information</strong> trapped in call recordings — client objections, buying signals, commitments made. Using Fireflies but recordings aren't transcribed or searchable.</p>
+      <ul style="margin: 0.75rem 0; padding-left: 1.25rem; font-size: 0.95rem;">
+      <li><strong>Sales → Strategy</strong> — briefs with real client language</li>
+      <li><strong>Sales → AM</strong> — handoffs with full context</li>
+      <li><strong>AM → Leadership</strong> — client health signals visible early</li>
+      <li><strong>Sales → Creative</strong> — work informed by what clients said</li>
+    </ul>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div style="border-left: 4px solid var(--color-partial); padding-left: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <h4 style="margin: 0; color: var(--color-dark); font-size: 1.1rem;">Phase 2: Capture Slack Decisions</h4>
+        <span style="background: var(--color-partial); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Week 3-4</span>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--color-partial); margin-bottom: 0.75rem;">51% → 65% flow health · Medium effort</div>
+      <p style="margin-bottom: 0.75rem;"><strong>77 types of information</strong> disappear into Slack — handoff details, brief clarifications, delivery issues, decisions made. They exist for a moment, then vanish into scroll.</p>
+      <ul style="margin: 0.75rem 0; padding-left: 1.25rem; font-size: 0.95rem;">
+        <li><strong>Ops → Leadership</strong> — friction visible before it escalates</li>
+        <li><strong>Production → Creative</strong> — specs arrive with the brief</li>
+        <li><strong>Cross-team</strong> — decisions become findable, not lost</li>
+      </ul>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div style="border-left: 4px solid var(--color-poor); padding-left: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <h4 style="margin: 0; color: var(--color-dark); font-size: 1.1rem;">Phase 3: Organize File Storage</h4>
+        <span style="background: var(--color-poor); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Week 5-6</span>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--color-poor); margin-bottom: 0.75rem;">65% → 78% flow health · Medium effort</div>
+      <p style="margin-bottom: 0.75rem;"><strong>73 types of information</strong> buried in messy Google Drive — creative briefs, media plans, brand guidelines. Shared but disorganized. Hard to find the right version.</p>
+      <ul style="margin: 0.75rem 0; padding-left: 1.25rem; font-size: 0.95rem;">
+        <li><strong>Strategy → Creative</strong> — briefs findable and current</li>
+        <li><strong>Media → Finance</strong> — media plans accessible for billing</li>
+        <li><strong>Production → AM</strong> — assets organized by client/project</li>
+      </ul>
+    </div>
+
+    <!-- FLOW HEALTH PROGRESSION -->
+    <div style="background: var(--color-light); border-radius: 12px; padding: 2rem; margin-top: 2.5rem;">
+      <h4 style="margin: 0 0 1.5rem 0; text-align: center; color: var(--color-dark);">Your Flow Health Progression</h4>
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; height: 120px; padding: 0 1rem;">
+        <div style="text-align: center; flex: 1;">
+          <div style="background: var(--color-dying); width: 60px; height: 45px; margin: 0 auto; border-radius: 4px 4px 0 0;"></div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-dying); margin-top: 0.5rem;">45%</div>
+          <div style="font-size: 0.8rem; color: var(--color-muted);">Today</div>
+        </div>
+        <div style="text-align: center; flex: 1;">
+          <div style="background: var(--color-poor); width: 60px; height: 51px; margin: 0 auto; border-radius: 4px 4px 0 0;"></div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-poor); margin-top: 0.5rem;">51%</div>
+          <div style="font-size: 0.8rem; color: var(--color-muted);">After Phase 1</div>
+        </div>
+        <div style="text-align: center; flex: 1;">
+          <div style="background: var(--color-partial); width: 60px; height: 65px; margin: 0 auto; border-radius: 4px 4px 0 0;"></div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-partial); margin-top: 0.5rem;">65%</div>
+          <div style="font-size: 0.8rem; color: var(--color-muted);">After Phase 2</div>
+        </div>
+        <div style="text-align: center; flex: 1;">
+          <div style="background: var(--color-healthy); width: 60px; height: 78px; margin: 0 auto; border-radius: 4px 4px 0 0;"></div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-healthy); margin-top: 0.5rem;">78%</div>
+          <div style="font-size: 0.8rem; color: var(--color-muted);">After Phase 3</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: WHAT THIS ENABLES -->
+  <div class="page">
+    <h2>What This Enables</h2>
+
+    <p class="lead">Here's what each phase unlocks — specific tasks that go from minutes to seconds.</p>
+
+    <!-- Phase 1: Call Recordings -->
+    <div style="border-left: 4px solid var(--color-healthy); padding-left: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h3 style="margin: 0; color: var(--color-dark);">Phase 1: Calls Searchable</h3>
+        <span style="background: var(--color-healthy); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Week 1-2</span>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--color-muted); margin-bottom: 0.75rem;">Auto-transcribes client calls, extracts commitments, makes everything searchable by client, topic, or date.</p>
+      <table class="flow-table" style="margin: 0;">
+        <thead>
+          <tr><th>Task</th><th style="text-align:center">Before</th><th style="text-align:center">After</th></tr>
+        </thead>
+        <tbody style="font-size: 0.85rem;">
+          <tr><td>Find what client said about budget <span style="color:#6b7280;font-size:0.75rem;">(Strategy)</span></td><td style="text-align:center; color: #dc2626;">25 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find competitor mentions <span style="color:#6b7280;font-size:0.75rem;">(Strategy)</span></td><td style="text-align:center; color: #dc2626;">25 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find commitments made to client <span style="color:#6b7280;font-size:0.75rem;">(AM)</span></td><td style="text-align:center; color: #dc2626;">30 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find client feedback on creative <span style="color:#6b7280;font-size:0.75rem;">(Creative)</span></td><td style="text-align:center; color: #dc2626;">25 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find prospect pain points <span style="color:#6b7280;font-size:0.75rem;">(Sales)</span></td><td style="text-align:center; color: #dc2626;">25 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phase 2: Slack Captured -->
+    <div style="border-left: 4px solid var(--color-partial); padding-left: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h3 style="margin: 0; color: var(--color-dark);">Phase 2: Slack Captured</h3>
+        <span style="background: var(--color-partial); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Week 3-4</span>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--color-muted); margin-bottom: 0.75rem;">Archives decisions, indexes context, flags unresolved threads. Makes coordination history searchable.</p>
+      <table class="flow-table" style="margin: 0;">
+        <thead>
+          <tr><th>Task</th><th style="text-align:center">Before</th><th style="text-align:center">After</th></tr>
+        </thead>
+        <tbody style="font-size: 0.85rem;">
+          <tr><td>Find handoff details from last week <span style="color:#6b7280;font-size:0.75rem;">(Production)</span></td><td style="text-align:center; color: #dc2626;">20 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find why we made that decision <span style="color:#6b7280;font-size:0.75rem;">(Strategy)</span></td><td style="text-align:center; color: #dc2626;">20 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find delivery issues flagged <span style="color:#6b7280;font-size:0.75rem;">(Ops)</span></td><td style="text-align:center; color: #dc2626;">15 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find brief clarifications <span style="color:#6b7280;font-size:0.75rem;">(Creative)</span></td><td style="text-align:center; color: #dc2626;">15 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find resource conflicts discussed <span style="color:#6b7280;font-size:0.75rem;">(Leadership)</span></td><td style="text-align:center; color: #dc2626;">20 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phase 3: File Storage -->
+    <div style="border-left: 4px solid var(--color-poor); padding-left: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h3 style="margin: 0; color: var(--color-dark);">Phase 3: File Storage Organized</h3>
+        <span style="background: var(--color-poor); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Week 5-6</span>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--color-muted); margin-bottom: 0.75rem;">Structures Google Drive, auto-tags assets, makes briefs/reports/guidelines findable by client, campaign, or date.</p>
+      <table class="flow-table" style="margin: 0;">
+        <thead>
+          <tr><th>Task</th><th style="text-align:center">Before</th><th style="text-align:center">After</th></tr>
+        </thead>
+        <tbody style="font-size: 0.85rem;">
+          <tr><td>Find latest brand guidelines <span style="color:#6b7280;font-size:0.75rem;">(Creative)</span></td><td style="text-align:center; color: #dc2626;">20 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find correct version of media plan <span style="color:#6b7280;font-size:0.75rem;">(Media)</span></td><td style="text-align:center; color: #dc2626;">15 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find last campaign report for client <span style="color:#6b7280;font-size:0.75rem;">(AM)</span></td><td style="text-align:center; color: #dc2626;">25 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find creative brief for active campaign <span style="color:#6b7280;font-size:0.75rem;">(Production)</span></td><td style="text-align:center; color: #dc2626;">20 min</td><td style="text-align:center; color: #22c55e;">1 min</td></tr>
+          <tr><td>Find pitch deck we used for similar client <span style="color:#6b7280;font-size:0.75rem;">(Sales)</span></td><td style="text-align:center; color: #dc2626;">30 min</td><td style="text-align:center; color: #22c55e;">2 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Total -->
+    <div style="background: var(--color-light); border-radius: 12px; padding: 1.5rem; text-align: center; margin-top: 1.5rem;">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+        <div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--color-primary);">189</div>
+          <div style="font-size: 0.85rem; color: var(--color-muted);">info types unlocked</div>
+        </div>
+        <div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--color-primary);">10+</div>
+          <div style="font-size: 0.85rem; color: var(--color-muted);">critical flows connected</div>
+        </div>
+        <div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--color-healthy);">78%</div>
+          <div style="font-size: 0.85rem; color: var(--color-muted);">flow health after 6 weeks</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: CLOSING -->
+  <div class="page">
+    <h2>What This Looks Like</h2>
+
+    <p class="lead">A strategist writing a brief for a new campaign:</p>
+
+    <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0;">
+      <thead>
+        <tr>
+          <th style="text-align: left; padding: 0.75rem; border-bottom: 2px solid var(--color-dying); color: var(--color-dying); width: 50%;">Today</th>
+          <th style="text-align: left; padding: 0.75rem; border-bottom: 2px solid var(--color-healthy); color: var(--color-healthy); width: 50%;">After Phase 1</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 0.95rem;">
+        <tr>
+          <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Asks Sales "what did the client actually say?"</td>
+          <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Searches "Client X kickoff call"</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Sales is busy, sends bullet points from memory</td>
+          <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Full transcript with client's actual words</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Brief uses generic language</td>
+          <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Brief uses the client's own language</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Creative misses the mark</td>
+          <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Creative hits the mark</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.5rem 0.75rem; color: var(--color-dying);">3 revision rounds</td>
+          <td style="padding: 0.5rem 0.75rem; color: var(--color-healthy);">Work lands first time</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
+      <p style="font-size: 1.1rem; line-height: 1.7; color: var(--color-dark);">Your agency generates 327 types of information. Right now, <strong>45%</strong> flows to the people who need it. The roadmap takes you to <strong>78%</strong> in 6 weeks.</p>
+      <p style="font-size: 1.1rem; line-height: 1.7; color: var(--color-dark); margin-top: 1rem;">Phase 1 starts with one change: <strong>make your calls searchable.</strong></p>
+    </div>
+
+    <p style="margin-top: 2.5rem; font-size: 1rem; color: var(--color-muted);">Ready to start? <a href="#" style="color: var(--color-primary);">Book a 30-minute walkthrough →</a></p>
+
+    <div style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; text-align: center; color: var(--color-muted); font-size: 0.85rem;">
+      <p style="margin: 0;">AI Readiness Audit · Soar Group · January 2026</p>
+    </div>
+  </div>
+
+</body>
+</html>

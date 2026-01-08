@@ -1,0 +1,105 @@
+{
+  "company": {
+    "name": "Soar Group",
+    "contact": "Sam Wright",
+    "role": "COO",
+    "email": "sam@soarwithus.co",
+    "type": "Full-service Agency",
+    "headcount": 85,
+    "revenue_band": "£3m-£10m",
+    "avg_salary": 45000,
+    "active_clients": 47,
+    "avg_client_value": 175000,
+    "deals_per_year": 100,
+    "win_rate": "25-40%",
+    "projects_per_year": 75,
+    "clients_lost_12mo": 34,
+    "people_left_12mo": 11,
+    "typical_revisions": 2
+  },
+  "departments": {
+    "Production": 28,
+    "Creative": 13,
+    "Account Management": 9,
+    "Strategy": 9,
+    "Leadership": 9,
+    "Media": 6,
+    "Sales": 3,
+    "Operations": 3,
+    "Finance": 3,
+    "HR": 2,
+    "Analytics": 0
+  },
+  "tools": {
+    "calls": "Fireflies",
+    "messaging": "Slack",
+    "email": "Gmail",
+    "files": "Google Drive",
+    "docs": "Notion",
+    "pm": "Notion",
+    "crm": "HubSpot",
+    "ad_platforms": ["Meta", "Google", "TikTok"],
+    "analytics": "Triple Whale"
+  },
+  "data_sources": [
+    {"name": "Analytics", "capture": 100, "connect": 100, "access": 100, "maturity": 100, "status": "healthy", "info_types": 15},
+    {"name": "PM", "capture": 100, "connect": 66, "access": 100, "maturity": 89, "status": "healthy", "info_types": 27},
+    {"name": "Ad Platforms", "capture": 66, "connect": 66, "access": 100, "maturity": 77, "status": "healthy", "info_types": 20},
+    {"name": "CRM", "capture": 66, "connect": 66, "access": 33, "maturity": 55, "status": "partial", "info_types": 16},
+    {"name": "Docs & Wikis", "capture": 66, "connect": 33, "access": 66, "maturity": 55, "status": "partial", "info_types": 25},
+    {"name": "HR System", "capture": null, "connect": null, "access": null, "maturity": 55, "status": "partial", "info_types": 14},
+    {"name": "Finance System", "capture": null, "connect": null, "access": null, "maturity": 55, "status": "partial", "info_types": 12},
+    {"name": "Call Recordings", "capture": 60, "connect": 25, "access": 25, "maturity": 37, "status": "poor", "info_types": 39},
+    {"name": "File Storage", "capture": 33, "connect": 33, "access": 25, "maturity": 30, "status": "poor", "info_types": 73},
+    {"name": "Internal Messaging", "capture": 20, "connect": 25, "access": 25, "maturity": 23, "status": "dying", "info_types": 77},
+    {"name": "Email", "capture": 0, "connect": 25, "access": 0, "maturity": 8, "status": "dying", "info_types": 9}
+  ],
+  "flow_health": {
+    "overall": 45,
+    "flows_freely": 62,
+    "underutilized": 179,
+    "not_captured": 86,
+    "total_info_types": 327
+  },
+  "roadmap": [
+    {"phase": 1, "action": "Make Calls Searchable", "info_types": 39, "effort": "Low", "flow_health_after": 51},
+    {"phase": 2, "action": "Capture Slack Decisions", "info_types": 77, "effort": "Medium", "flow_health_after": 65},
+    {"phase": 3, "action": "Organize File Storage", "info_types": 73, "effort": "Medium", "flow_health_after": 78}
+  ],
+  "key_findings": {
+    "where_info_dies": {
+      "source": "Internal Messaging",
+      "maturity": 23,
+      "info_types": 77,
+      "description": "Decisions get made in Slack, then vanish. Handoff details, brief clarifications, delivery issues—exist for a moment then disappear."
+    },
+    "captured_but_trapped": {
+      "source": "Call Recordings",
+      "maturity": 37,
+      "info_types": 39,
+      "description": "Using Fireflies but recordings not transcribed or searchable. Client context locked in audio files."
+    },
+    "critical_gap": {
+      "source": "File Storage",
+      "maturity": 30,
+      "info_types": 73,
+      "description": "Shared but messy Google Drive. Creative briefs, media plans, brand guidelines—hard to find the right version."
+    },
+    "whats_working": {
+      "sources": ["Analytics (100%)", "PM (89%)", "Ad Platforms (77%)"],
+      "description": "Triple Whale dashboards, Notion PM, and ad platform data already flowing well."
+    }
+  },
+  "pain_signals": {
+    "high": ["Time searching", "Same questions repeated", "New hires slow to ramp", "Critical info in few heads", "Surprise churn", "Warning signs don't reach right people", "Sales promises don't reach delivery", "Sales/delivery misalignment", "Work misses brief", "Outdated info"],
+    "lower": ["Don't know who knows what", "Knowledge leaves with people", "Client health hard to see", "Context lost in onboarding", "Too many revisions"]
+  },
+  "priorities": ["Growth", "Retention", "Efficiency", "Speed", "Cost savings"],
+  "roi": {
+    "time_bleeding": 540686,
+    "missed_deals": 700000,
+    "churn": 351372,
+    "rework": 34950,
+    "total": 1627008
+  }
+}

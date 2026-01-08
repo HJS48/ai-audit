@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agency AI Readiness Audit</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #08080a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        /* Navigation */
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 40px;
+            border-bottom: 1px solid #1a1a1a;
+            position: sticky;
+            top: 0;
+            background: #08080a;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            color: #666;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab:hover {
+            border-color: #444;
+            color: #888;
+        }
+        
+        .nav-tab.active {
+            background: #1a1a1a;
+            border-color: #333;
+            color: #fff;
+        }
+        
+        .company-name {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .company-name span {
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        /* Main Content */
+        .main {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .page-header {
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        
+        .page-header h1 span {
+            color: #ff4444;
+            font-weight: 600;
+        }
+        
+        .page-header h1 span.green {
+            color: #44dd88;
+        }
+        
+        .page-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Cost Summary Cards */
+        .cost-summary {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .cost-card {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        .cost-card.primary {
+            background: linear-gradient(135deg, #1a1010 0%, #111 100%);
+            border-color: #331a1a;
+        }
+        
+        .cost-card-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .cost-card-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        .cost-card.primary .cost-card-value {
+            font-size: 42px;
+            color: #ff4444;
+        }
+        
+        .cost-card-sub {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .cost-card-sub span {
+            color: #ff4444;
+        }
+        
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .three-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .panel {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        .panel.full {
+            grid-column: 1 / -1;
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .panel-action {
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .panel-action:hover {
+            color: #888;
+        }
+        
+        /* Automation List */
+        .automation-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 16px;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .automation-item:last-child {
+            border-bottom: none;
+        }
+        
+        .automation-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+        
+        .automation-meta {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .automation-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: #44dd88;
+            text-align: right;
+        }
+        
+        .automation-fte {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            color: #888;
+            text-align: right;
+            min-width: 80px;
+        }
+        
+        /* Task Compression */
+        .task-item {
+            padding: 14px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .task-name {
+            font-size: 13px;
+            color: #e0e0e0;
+        }
+        
+        .task-reduction {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            color: #44dd88;
+        }
+        
+        .task-bar {
+            height: 6px;
+            background: #1a1a1a;
+            border-radius: 3px;
+            overflow: hidden;
+            display: flex;
+        }
+        
+        .task-bar-before {
+            background: #ff4444;
+            transition: width 0.5s ease;
+        }
+        
+        .task-bar-after {
+            background: #44dd88;
+        }
+        
+        .task-times {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #666;
+        }
+        
+        /* Key Person Risk */
+        .risk-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .risk-card {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .risk-card.high {
+            border-color: #442222;
+            background: linear-gradient(135deg, #1a1010 0%, #0a0a0a 100%);
+        }
+        
+        .risk-dept {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .risk-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff4444;
+        }
+        
+        .risk-label {
+            font-size: 10px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        /* Sliders Section */
+        .assumptions-panel {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .assumptions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .slider-name {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .slider-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            color: #fff;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #2a2a2a;
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #1a2a1a 0%, #111 100%);
+            border: 1px solid #2a3a2a;
+            border-radius: 12px;
+            padding: 32px;
+        }
+        
+        .cta-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        
+        .cta-content p {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #44dd88;
+            color: #000;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: #55ee99;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #888;
+            border: 1px solid #333;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #555;
+            color: #aaa;
+        }
+        
+        /* Unlock Section */
+        .unlock-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .unlock-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+        }
+        
+        .unlock-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a2a1a;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .unlock-icon.blocked {
+            background: #2a1a1a;
+        }
+        
+        .unlock-text {
+            font-size: 13px;
+            color: #888;
+        }
+        
+        .unlock-item.enabled .unlock-text {
+            color: #44dd88;
+        }
+        
+        /* ========== INFORMATION FLOW PAGE ========== */
+        
+        .flow-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+            height: calc(100vh - 250px);
+            min-height: 500px;
+        }
+        
+        .flow-viz {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .flow-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .flow-filters {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .filter-group {
+            margin-bottom: 16px;
+        }
+        
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .filter-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 6px 12px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 4px;
+            color: #888;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover {
+            border-color: #444;
+            color: #aaa;
+        }
+        
+        .filter-btn.active {
+            background: #2a2a2a;
+            border-color: #444;
+            color: #fff;
+        }
+        
+        .filter-btn.dying { border-left: 3px solid #ff4444; }
+        .filter-btn.trapped { border-left: 3px solid #ffaa00; }
+        .filter-btn.healthy { border-left: 3px solid #44dd88; }
+        
+        .flow-details {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .detail-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        
+        .detail-subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .info-item {
+            padding: 12px;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            border-left: 3px solid #ff4444;
+        }
+        
+        .info-item.trapped {
+            border-left-color: #ffaa00;
+        }
+        
+        .info-item-name {
+            font-size: 13px;
+            color: #e0e0e0;
+            margin-bottom: 4px;
+        }
+        
+        .info-item-meta {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        /* Department nodes in viz */
+        .dept-node {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .dept-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            position: relative;
+        }
+        
+        .dept-circle::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: #ff4444;
+            transform: rotate(0deg);
+        }
+        
+        .dept-circle.high-risk::after {
+            border-top-color: #ff4444;
+            border-right-color: #ff4444;
+        }
+        
+        .dept-label {
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+        }
+        
+        .dept-node:hover .dept-circle {
+            border-color: #fff;
+        }
+        
+        .dept-node.selected .dept-circle {
+            border-color: #44dd88;
+            box-shadow: 0 0 20px rgba(68, 221, 136, 0.3);
+        }
+        
+        /* Flow legend */
+        .flow-legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .legend-dot.dying { background: #ff4444; }
+        .legend-dot.trapped { background: #ffaa00; }
+        .legend-dot.healthy { background: #44dd88; }
+        
+        /* ========== AUTOMATIONS PAGE ========== */
+        
+        .automation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .automation-card {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.2s;
+        }
+        
+        .automation-card:hover {
+            border-color: #2a2a2a;
+        }
+        
+        .automation-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .automation-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        
+        .automation-card-type {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 8px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            color: #888;
+        }
+        
+        .automation-card-type.capture {
+            background: #1a2a1a;
+            color: #44dd88;
+        }
+        
+        .automation-card-type.connect {
+            background: #1a1a2a;
+            color: #4488dd;
+        }
+        
+        .automation-card-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: #44dd88;
+        }
+        
+        .automation-card-value span {
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+        }
+        
+        .automation-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+            padding: 16px 0;
+            border-top: 1px solid #1a1a1a;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .automation-stat {
+            text-align: center;
+        }
+        
+        .automation-stat-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        .automation-stat-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        
+        .automation-fixes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .fix-tag {
+            padding: 4px 8px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #888;
+        }
+        
+        .fix-tag.churn { background: #2a1a1a; color: #ff8888; }
+        .fix-tag.deals { background: #2a2a1a; color: #ddaa44; }
+        .fix-tag.rework { background: #1a2a2a; color: #44aadd; }
+        
+        /* ========== ACTION PLAN PAGE ========== */
+        
+        .roadmap {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .roadmap-phase {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .phase-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            background: #0a0a0a;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .phase-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .phase-number {
+            width: 32px;
+            height: 32px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        .phase-number.active {
+            background: #44dd88;
+            color: #000;
+        }
+        
+        .phase-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .phase-timeline {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .phase-value {
+            text-align: right;
+        }
+        
+        .phase-value-amount {
+            font-family: 'Space Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: #44dd88;
+        }
+        
+        .phase-value-label {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .phase-items {
+            padding: 20px 24px;
+        }
+        
+        .phase-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .phase-item:last-child {
+            border-bottom: none;
+        }
+        
+        .phase-item-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .phase-item-icon {
+            width: 40px;
+            height: 40px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .phase-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+        
+        .phase-item-desc {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .phase-item-value {
+            text-align: right;
+        }
+        
+        .phase-item-amount {
+            font-family: 'Space Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: #44dd88;
+        }
+        
+        .phase-item-fte {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        /* Summary bar */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .summary-item {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        .summary-value.green { color: #44dd88; }
+        .summary-value.red { color: #ff4444; }
+        
+        .summary-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="logo">STUDIO 258</div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-page="overview">Overview</button>
+            <button class="nav-tab" data-page="flow">Information Flow</button>
+            <button class="nav-tab" data-page="automations">Automations</button>
+            <button class="nav-tab" data-page="action">Action Plan</button>
+        </div>
+        <div class="company-name">Audit for <span>Example Agency</span></div>
+    </nav>
+    
+    <main class="main">
+        
+        <!-- ==================== OVERVIEW PAGE ==================== -->
+        <div class="page active" id="overview">
+            <div class="page-header">
+                <h1>Your information gaps cost <span>£698,000/year</span></h1>
+                <p>Based on 25 employees, £45k avg salary, 20 clients at £50k average value</p>
+            </div>
+            
+            <div class="cost-summary">
+                <div class="cost-card primary">
+                    <div class="cost-card-label">Total Annual Cost</div>
+                    <div class="cost-card-value">£698k</div>
+                    <div class="cost-card-sub">Equivalent to <span>12.2 full-time people</span></div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-card-label">Time Bleeding</div>
+                    <div class="cost-card-value">£548k</div>
+                    <div class="cost-card-sub">487 hrs/week wasted</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-card-label">Preventable Churn</div>
+                    <div class="cost-card-value">£40k</div>
+                    <div class="cost-card-sub">0.4 clients/year</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-card-label">Missed Deals</div>
+                    <div class="cost-card-value">£60k</div>
+                    <div class="cost-card-sub">2 extra deals possible</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-card-label">Rework</div>
+                    <div class="cost-card-value">£50k</div>
+                    <div class="cost-card-sub">100 wasted revisions</div>
+                </div>
+            </div>
+            
+            <div class="assumptions-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Adjust Your Numbers</div>
+                    <div class="panel-action">Reset to defaults</div>
+                </div>
+                <div class="assumptions-grid">
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">Total Headcount</span>
+                            <span class="slider-value">25</span>
+                        </div>
+                        <input type="range" class="slider" min="5" max="200" value="25">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">Avg Salary</span>
+                            <span class="slider-value">£45,000</span>
+                        </div>
+                        <input type="range" class="slider" min="25000" max="100000" value="45000">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">Number of Clients</span>
+                            <span class="slider-value">20</span>
+                        </div>
+                        <input type="range" class="slider" min="5" max="100" value="20">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">Avg Client Value</span>
+                            <span class="slider-value">£50,000</span>
+                        </div>
+                        <input type="range" class="slider" min="10000" max="500000" value="50000">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">Preventable Churn %</span>
+                            <span class="slider-value">20%</span>
+                        </div>
+                        <input type="range" class="slider" min="5" max="50" value="20">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">Deals Pitched/Year</span>
+                            <span class="slider-value">40</span>
+                        </div>
+                        <input type="range" class="slider" min="10" max="200" value="40">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">Projects/Year</span>
+                            <span class="slider-value">100</span>
+                        </div>
+                        <input type="range" class="slider" min="20" max="500" value="100">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span class="slider-name">Extra Revisions/Project</span>
+                            <span class="slider-value">2</span>
+                        </div>
+                        <input type="range" class="slider" min="0" max="5" value="2">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="two-col">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Top Fixes by Value</div>
+                        <div class="panel-action">View all →</div>
+                    </div>
+                    
+                    <div class="automation-item">
+                        <div>
+                            <div class="automation-name">Google Drive Connect Pipeline</div>
+                            <div class="automation-meta">49 info types fixed · connect</div>
+                        </div>
+                        <div class="automation-fte">3.0 FTE</div>
+                        <div class="automation-value">£149k/yr</div>
+                    </div>
+                    
+                    <div class="automation-item">
+                        <div>
+                            <div class="automation-name">Call Recordings Capture Pipeline</div>
+                            <div class="automation-meta">24 info types fixed · capture</div>
+                        </div>
+                        <div class="automation-fte">1.6 FTE</div>
+                        <div class="automation-value">£129k/yr</div>
+                    </div>
+                    
+                    <div class="automation-item">
+                        <div>
+                            <div class="automation-name">Slack Capture Pipeline</div>
+                            <div class="automation-meta">9 info types fixed · capture</div>
+                        </div>
+                        <div class="automation-fte">0.6 FTE</div>
+                        <div class="automation-value">£40k/yr</div>
+                    </div>
+                    
+                    <div class="automation-item">
+                        <div>
+                            <div class="automation-name">Email Capture Pipeline</div>
+                            <div class="automation-meta">6 info types fixed · capture</div>
+                        </div>
+                        <div class="automation-fte">0.4 FTE</div>
+                        <div class="automation-value">£39k/yr</div>
+                    </div>
+                    
+                    <div class="automation-item">
+                        <div>
+                            <div class="automation-name">CRM Connect Pipeline</div>
+                            <div class="automation-meta">6 info types fixed · connect</div>
+                        </div>
+                        <div class="automation-fte">0.2 FTE</div>
+                        <div class="automation-value">£24k/yr</div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Tasks That Become Instant</div>
+                        <div class="panel-action">View all 27 →</div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-header">
+                            <div class="task-name">Get new hire up to speed on client</div>
+                            <div class="task-reduction">-94%</div>
+                        </div>
+                        <div class="task-bar">
+                            <div class="task-bar-before" style="width: 94%"></div>
+                            <div class="task-bar-after" style="width: 6%"></div>
+                        </div>
+                        <div class="task-times">
+                            <span>Before: 4 hours</span>
+                            <span>After: 15 mins</span>
+                        </div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-header">
+                            <div class="task-name">Pull data for client QBR</div>
+                            <div class="task-reduction">-97%</div>
+                        </div>
+                        <div class="task-bar">
+                            <div class="task-bar-before" style="width: 97%"></div>
+                            <div class="task-bar-after" style="width: 3%"></div>
+                        </div>
+                        <div class="task-times">
+                            <span>Before: 3 hours</span>
+                            <span>After: 5 mins</span>
+                        </div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-header">
+                            <div class="task-name">Find why performance dropped</div>
+                            <div class="task-reduction">-98%</div>
+                        </div>
+                        <div class="task-bar">
+                            <div class="task-bar-before" style="width: 98%"></div>
+                            <div class="task-bar-after" style="width: 2%"></div>
+                        </div>
+                        <div class="task-times">
+                            <span>Before: 1 hour</span>
+                            <span>After: 1 min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="task-header">
+                            <div class="task-name">Search past campaign learnings</div>
+                            <div class="task-reduction">-98%</div>
+                        </div>
+                        <div class="task-bar">
+                            <div class="task-bar-before" style="width: 98%"></div>
+                            <div class="task-bar-after" style="width: 2%"></div>
+                        </div>
+                        <div class="task-times">
+                            <span>Before: 45 mins</span>
+                            <span>After: 1 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="two-col">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Key Person Risk</div>
+                        <div class="panel-action">If someone leaves, what walks out?</div>
+                    </div>
+                    
+                    <div class="risk-grid">
+                        <div class="risk-card high">
+                            <div class="risk-dept">Account Mgmt</div>
+                            <div class="risk-value">12</div>
+                            <div class="risk-label">info types in heads</div>
+                        </div>
+                        <div class="risk-card high">
+                            <div class="risk-dept">Media</div>
+                            <div class="risk-value">15</div>
+                            <div class="risk-label">info types in heads</div>
+                        </div>
+                        <div class="risk-card high">
+                            <div class="risk-dept">Leadership</div>
+                            <div class="risk-value">14</div>
+                            <div class="risk-label">info types in heads</div>
+                        </div>
+                        <div class="risk-card">
+                            <div class="risk-dept">Operations</div>
+                            <div class="risk-value">11</div>
+                            <div class="risk-label">info types in heads</div>
+                        </div>
+                        <div class="risk-card">
+                            <div class="risk-dept">Sales</div>
+                            <div class="risk-value">11</div>
+                            <div class="risk-label">info types in heads</div>
+                        </div>
+                        <div class="risk-card">
+                            <div class="risk-dept">Production</div>
+                            <div class="risk-value">10</div>
+                            <div class="risk-label">info types in heads</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">AI Readiness</div>
+                        <div class="panel-action">What becomes possible</div>
+                    </div>
+                    
+                    <div class="unlock-grid">
+                        <div class="unlock-item">
+                            <div class="unlock-icon blocked">❌</div>
+                            <div class="unlock-text">Query past client conversations</div>
+                        </div>
+                        <div class="unlock-item">
+                            <div class="unlock-icon blocked">❌</div>
+                            <div class="unlock-text">AI meeting summaries</div>
+                        </div>
+                        <div class="unlock-item">
+                            <div class="unlock-icon blocked">❌</div>
+                            <div class="unlock-text">Auto-surface at-risk clients</div>
+                        </div>
+                        <div class="unlock-item">
+                            <div class="unlock-icon blocked">❌</div>
+                            <div class="unlock-text">Search all company knowledge</div>
+                        </div>
+                        <div class="unlock-item">
+                            <div class="unlock-icon blocked">❌</div>
+                            <div class="unlock-text">Auto-generate client reports</div>
+                        </div>
+                        <div class="unlock-item">
+                            <div class="unlock-icon blocked">❌</div>
+                            <div class="unlock-text">Instant new hire onboarding</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #1a1a1a;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 8px;">With top 2 fixes implemented:</div>
+                        <div class="unlock-grid">
+                            <div class="unlock-item enabled">
+                                <div class="unlock-icon">✓</div>
+                                <div class="unlock-text">Query past client conversations</div>
+                            </div>
+                            <div class="unlock-item enabled">
+                                <div class="unlock-icon">✓</div>
+                                <div class="unlock-text">Search all company knowledge</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-section">
+                <div class="cta-content">
+                    <h3>Top 2 automations recover 4.6 FTE worth of time</h3>
+                    <p>Google Drive Connect + Call Recordings Capture = £278k/year in value</p>
+                </div>
+                <div class="cta-buttons">
+                    <button class="btn btn-secondary">Download Report</button>
+                    <button class="btn btn-primary">Book Implementation Call</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== INFORMATION FLOW PAGE ==================== -->
+        <div class="page" id="flow">
+            <div class="page-header">
+                <h1><span>159</span> information types dying, <span class="green">111</span> trapped</h1>
+                <p>Click a department to see what information flows in and out</p>
+            </div>
+            
+            <div class="flow-container">
+                <div class="flow-viz">
+                    <!-- Department nodes positioned in a circle -->
+                    <div class="dept-node selected" style="left: 50%; top: 8%; transform: translateX(-50%);">
+                        <div class="dept-circle high-risk">10</div>
+                        <div class="dept-label">Account Mgmt</div>
+                    </div>
+                    <div class="dept-node" style="left: 82%; top: 20%;">
+                        <div class="dept-circle">12</div>
+                        <div class="dept-label">Analytics</div>
+                    </div>
+                    <div class="dept-node" style="left: 95%; top: 45%; transform: translateX(-50%);">
+                        <div class="dept-circle high-risk">16</div>
+                        <div class="dept-label">Creative</div>
+                    </div>
+                    <div class="dept-node" style="left: 82%; top: 70%;">
+                        <div class="dept-circle">7</div>
+                        <div class="dept-label">Finance</div>
+                    </div>
+                    <div class="dept-node" style="left: 50%; top: 85%; transform: translateX(-50%);">
+                        <div class="dept-circle">11</div>
+                        <div class="dept-label">HR</div>
+                    </div>
+                    <div class="dept-node" style="left: 18%; top: 70%;">
+                        <div class="dept-circle high-risk">18</div>
+                        <div class="dept-label">Leadership</div>
+                    </div>
+                    <div class="dept-node" style="left: 5%; top: 45%; transform: translateX(50%);">
+                        <div class="dept-circle high-risk">25</div>
+                        <div class="dept-label">Media</div>
+                    </div>
+                    <div class="dept-node" style="left: 18%; top: 20%;">
+                        <div class="dept-circle">13</div>
+                        <div class="dept-label">Operations</div>
+                    </div>
+                    <div class="dept-node" style="left: 30%; top: 50%;">
+                        <div class="dept-circle">16</div>
+                        <div class="dept-label">Production</div>
+                    </div>
+                    <div class="dept-node" style="left: 70%; top: 50%;">
+                        <div class="dept-circle">15</div>
+                        <div class="dept-label">Sales</div>
+                    </div>
+                    <div class="dept-node" style="left: 50%; top: 50%; transform: translateX(-50%);">
+                        <div class="dept-circle">16</div>
+                        <div class="dept-label">Strategy</div>
+                    </div>
+                    
+                    <div class="flow-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot dying"></div>
+                            <span>Dying (nowhere/heads)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot trapped"></div>
+                            <span>Trapped (not flowing)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot healthy"></div>
+                            <span>Healthy</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flow-sidebar">
+                    <div class="flow-filters">
+                        <div class="filter-group">
+                            <div class="filter-label">Status</div>
+                            <div class="filter-buttons">
+                                <button class="filter-btn active">All</button>
+                                <button class="filter-btn dying">Dying</button>
+                                <button class="filter-btn trapped">Trapped</button>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <div class="filter-label">Criticality</div>
+                            <div class="filter-buttons">
+                                <button class="filter-btn active">All</button>
+                                <button class="filter-btn">Critical</button>
+                                <button class="filter-btn">Important</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-details">
+                        <div class="detail-header">Account Management</div>
+                        <div class="detail-subtitle">12 info types in heads · 4 affect 3+ depts</div>
+                        
+                        <div class="info-list">
+                            <div class="info-item">
+                                <div class="info-item-name">Client Health Signals</div>
+                                <div class="info-item-meta">Needed by: Finance, Leadership, Sales · Critical</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-item-name">Client Feedback</div>
+                                <div class="info-item-meta">Needed by: Creative, Leadership, Strategy · Critical</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-item-name">Client Priority Shifts</div>
+                                <div class="info-item-meta">Needed by: Creative, Media, Strategy · Critical</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-item-name">Client Preferences</div>
+                                <div class="info-item-meta">Needed by: Creative, Media, Operations · Important</div>
+                            </div>
+                            <div class="info-item trapped">
+                                <div class="info-item-name">Renewal/Contract Status</div>
+                                <div class="info-item-meta">In CRM · Needed by: Finance, Leadership, Sales</div>
+                            </div>
+                            <div class="info-item trapped">
+                                <div class="info-item-name">Scope Creep Requests</div>
+                                <div class="info-item-meta">In Email · Needed by: Finance, Leadership, Ops</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== AUTOMATIONS PAGE ==================== -->
+        <div class="page" id="automations">
+            <div class="page-header">
+                <h1>16 automations identified, <span class="green">£500k+</span> total value</h1>
+                <p>Each automation fixes specific information gaps across departments</p>
+            </div>
+            
+            <div class="automation-grid">
+                <div class="automation-card">
+                    <div class="automation-card-header">
+                        <div>
+                            <div class="automation-card-title">Google Drive Connect Pipeline</div>
+                            <div class="automation-card-type connect">connect</div>
+                        </div>
+                        <div class="automation-card-value">£149k <span>/yr</span></div>
+                    </div>
+                    <div class="automation-stats">
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">49</div>
+                            <div class="automation-stat-label">Info Types</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">118</div>
+                            <div class="automation-stat-label">Hrs/Week</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">3.0</div>
+                            <div class="automation-stat-label">FTE Equiv</div>
+                        </div>
+                    </div>
+                    <div class="automation-fixes">
+                        <span class="fix-tag">Creative Briefs</span>
+                        <span class="fix-tag">Campaign Reports</span>
+                        <span class="fix-tag">Brand Guidelines</span>
+                        <span class="fix-tag">Media Plans</span>
+                        <span class="fix-tag">+45 more</span>
+                    </div>
+                </div>
+                
+                <div class="automation-card">
+                    <div class="automation-card-header">
+                        <div>
+                            <div class="automation-card-title">Call Recordings Capture Pipeline</div>
+                            <div class="automation-card-type capture">capture</div>
+                        </div>
+                        <div class="automation-card-value">£129k <span>/yr</span></div>
+                    </div>
+                    <div class="automation-stats">
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">24</div>
+                            <div class="automation-stat-label">Info Types</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">66</div>
+                            <div class="automation-stat-label">Hrs/Week</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">1.6</div>
+                            <div class="automation-stat-label">FTE Equiv</div>
+                        </div>
+                    </div>
+                    <div class="automation-fixes">
+                        <span class="fix-tag churn">Client Health Signals</span>
+                        <span class="fix-tag churn">Client Feedback</span>
+                        <span class="fix-tag deals">Commitments Made</span>
+                        <span class="fix-tag deals">Prospect Pain Points</span>
+                        <span class="fix-tag">+20 more</span>
+                    </div>
+                </div>
+                
+                <div class="automation-card">
+                    <div class="automation-card-header">
+                        <div>
+                            <div class="automation-card-title">Slack Capture Pipeline</div>
+                            <div class="automation-card-type capture">capture</div>
+                        </div>
+                        <div class="automation-card-value">£40k <span>/yr</span></div>
+                    </div>
+                    <div class="automation-stats">
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">9</div>
+                            <div class="automation-stat-label">Info Types</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">23</div>
+                            <div class="automation-stat-label">Hrs/Week</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">0.6</div>
+                            <div class="automation-stat-label">FTE Equiv</div>
+                        </div>
+                    </div>
+                    <div class="automation-fixes">
+                        <span class="fix-tag rework">Brief Clarifications</span>
+                        <span class="fix-tag rework">Quality Check Results</span>
+                        <span class="fix-tag">Asset Handoffs</span>
+                        <span class="fix-tag">+6 more</span>
+                    </div>
+                </div>
+                
+                <div class="automation-card">
+                    <div class="automation-card-header">
+                        <div>
+                            <div class="automation-card-title">Email Capture Pipeline</div>
+                            <div class="automation-card-type capture">capture</div>
+                        </div>
+                        <div class="automation-card-value">£39k <span>/yr</span></div>
+                    </div>
+                    <div class="automation-stats">
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">6</div>
+                            <div class="automation-stat-label">Info Types</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">16</div>
+                            <div class="automation-stat-label">Hrs/Week</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">0.4</div>
+                            <div class="automation-stat-label">FTE Equiv</div>
+                        </div>
+                    </div>
+                    <div class="automation-fixes">
+                        <span class="fix-tag rework">Client Amends History</span>
+                        <span class="fix-tag rework">Revision Tracking</span>
+                        <span class="fix-tag">Billing Disputes</span>
+                        <span class="fix-tag">+3 more</span>
+                    </div>
+                </div>
+                
+                <div class="automation-card">
+                    <div class="automation-card-header">
+                        <div>
+                            <div class="automation-card-title">CRM Connect Pipeline</div>
+                            <div class="automation-card-type connect">connect</div>
+                        </div>
+                        <div class="automation-card-value">£24k <span>/yr</span></div>
+                    </div>
+                    <div class="automation-stats">
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">6</div>
+                            <div class="automation-stat-label">Info Types</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">9</div>
+                            <div class="automation-stat-label">Hrs/Week</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">0.2</div>
+                            <div class="automation-stat-label">FTE Equiv</div>
+                        </div>
+                    </div>
+                    <div class="automation-fixes">
+                        <span class="fix-tag churn">Renewal Status</span>
+                        <span class="fix-tag deals">Win/Loss Reasons</span>
+                        <span class="fix-tag">Deal Stages</span>
+                        <span class="fix-tag">+3 more</span>
+                    </div>
+                </div>
+                
+                <div class="automation-card">
+                    <div class="automation-card-header">
+                        <div>
+                            <div class="automation-card-title">Ad Platforms Capture Pipeline</div>
+                            <div class="automation-card-type capture">capture</div>
+                        </div>
+                        <div class="automation-card-value">£22k <span>/yr</span></div>
+                    </div>
+                    <div class="automation-stats">
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">8</div>
+                            <div class="automation-stat-label">Info Types</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">20</div>
+                            <div class="automation-stat-label">Hrs/Week</div>
+                        </div>
+                        <div class="automation-stat">
+                            <div class="automation-stat-value">0.5</div>
+                            <div class="automation-stat-label">FTE Equiv</div>
+                        </div>
+                    </div>
+                    <div class="automation-fixes">
+                        <span class="fix-tag">Media Test Results</span>
+                        <span class="fix-tag">Creative Performance</span>
+                        <span class="fix-tag">Audience Performance</span>
+                        <span class="fix-tag">+5 more</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-section">
+                <div class="cta-content">
+                    <h3>Need help prioritizing?</h3>
+                    <p>We'll help you build a phased implementation plan based on your specific needs</p>
+                </div>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary">Book Strategy Call</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== ACTION PLAN PAGE ==================== -->
+        <div class="page" id="action">
+            <div class="page-header">
+                <h1>Your implementation roadmap</h1>
+                <p>Phased approach to fixing your information gaps, starting with highest-impact quick wins</p>
+            </div>
+            
+            <div class="summary-bar">
+                <div class="summary-item">
+                    <div class="summary-value green">£381k</div>
+                    <div class="summary-label">Total Value</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">6.0</div>
+                    <div class="summary-label">FTE Recovered</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">5</div>
+                    <div class="summary-label">Automations</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">12 weeks</div>
+                    <div class="summary-label">Timeline</div>
+                </div>
+            </div>
+            
+            <div class="roadmap">
+                <div class="roadmap-phase">
+                    <div class="phase-header">
+                        <div class="phase-title">
+                            <div class="phase-number active">1</div>
+                            <div>
+                                <div class="phase-name">Quick Wins</div>
+                                <div class="phase-timeline">Weeks 1-4</div>
+                            </div>
+                        </div>
+                        <div class="phase-value">
+                            <div class="phase-value-amount">£173k/yr</div>
+                            <div class="phase-value-label">value unlocked</div>
+                        </div>
+                    </div>
+                    <div class="phase-items">
+                        <div class="phase-item">
+                            <div class="phase-item-info">
+                                <div class="phase-item-icon">📁</div>
+                                <div>
+                                    <div class="phase-item-name">Google Drive Connect Pipeline</div>
+                                    <div class="phase-item-desc">Index and connect existing docs · Low complexity</div>
+                                </div>
+                            </div>
+                            <div class="phase-item-value">
+                                <div class="phase-item-amount">£149k</div>
+                                <div class="phase-item-fte">3.0 FTE</div>
+                            </div>
+                        </div>
+                        <div class="phase-item">
+                            <div class="phase-item-info">
+                                <div class="phase-item-icon">🔗</div>
+                                <div>
+                                    <div class="phase-item-name">CRM Connect Pipeline</div>
+                                    <div class="phase-item-desc">Surface deal data to other teams · Low complexity</div>
+                                </div>
+                            </div>
+                            <div class="phase-item-value">
+                                <div class="phase-item-amount">£24k</div>
+                                <div class="phase-item-fte">0.2 FTE</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="roadmap-phase">
+                    <div class="phase-header">
+                        <div class="phase-title">
+                            <div class="phase-number">2</div>
+                            <div>
+                                <div class="phase-name">Core Infrastructure</div>
+                                <div class="phase-timeline">Weeks 5-8</div>
+                            </div>
+                        </div>
+                        <div class="phase-value">
+                            <div class="phase-value-amount">£169k/yr</div>
+                            <div class="phase-value-label">value unlocked</div>
+                        </div>
+                    </div>
+                    <div class="phase-items">
+                        <div class="phase-item">
+                            <div class="phase-item-info">
+                                <div class="phase-item-icon">🎙️</div>
+                                <div>
+                                    <div class="phase-item-name">Call Recordings Capture Pipeline</div>
+                                    <div class="phase-item-desc">Transcribe, extract, and make searchable · Medium complexity</div>
+                                </div>
+                            </div>
+                            <div class="phase-item-value">
+                                <div class="phase-item-amount">£129k</div>
+                                <div class="phase-item-fte">1.6 FTE</div>
+                            </div>
+                        </div>
+                        <div class="phase-item">
+                            <div class="phase-item-info">
+                                <div class="phase-item-icon">💬</div>
+                                <div>
+                                    <div class="phase-item-name">Slack Capture Pipeline</div>
+                                    <div class="phase-item-desc">Capture decisions and handoffs from threads · Medium complexity</div>
+                                </div>
+                            </div>
+                            <div class="phase-item-value">
+                                <div class="phase-item-amount">£40k</div>
+                                <div class="phase-item-fte">0.6 FTE</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="roadmap-phase">
+                    <div class="phase-header">
+                        <div class="phase-title">
+                            <div class="phase-number">3</div>
+                            <div>
+                                <div class="phase-name">Extended Capture</div>
+                                <div class="phase-timeline">Weeks 9-12</div>
+                            </div>
+                        </div>
+                        <div class="phase-value">
+                            <div class="phase-value-amount">£39k/yr</div>
+                            <div class="phase-value-label">value unlocked</div>
+                        </div>
+                    </div>
+                    <div class="phase-items">
+                        <div class="phase-item">
+                            <div class="phase-item-info">
+                                <div class="phase-item-icon">📧</div>
+                                <div>
+                                    <div class="phase-item-name">Email Capture Pipeline</div>
+                                    <div class="phase-item-desc">Extract client communications and decisions · Medium complexity</div>
+                                </div>
+                            </div>
+                            <div class="phase-item-value">
+                                <div class="phase-item-amount">£39k</div>
+                                <div class="phase-item-fte">0.4 FTE</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px;"></div>
+            
+            <div class="cta-section">
+                <div class="cta-content">
+                    <h3>Ready to start?</h3>
+                    <p>Phase 1 can be live in 4 weeks. Let's talk implementation.</p>
+                </div>
+                <div class="cta-buttons">
+                    <button class="btn btn-secondary">Download PDF</button>
+                    <button class="btn btn-primary">Book Implementation Call</button>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+    
+    <script>
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show corresponding page
+                const pageId = tab.dataset.page;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+            });
+        });
+        
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const parent = btn.closest('.filter-buttons');
+                parent.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Department node selection
+        document.querySelectorAll('.dept-node').forEach(node => {
+            node.addEventListener('click', () => {
+                document.querySelectorAll('.dept-node').forEach(n => n.classList.remove('selected'));
+                node.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html>
